@@ -1,0 +1,8 @@
+setuptools
+docopt
+bob.extension
+bob.io.base
+bob.io.image
+bob.io.video
+bob.ip.draw
+bob.ip.color

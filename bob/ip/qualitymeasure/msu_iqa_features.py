@@ -14,7 +14,7 @@ import numpy as np
 import scipy as sp
 import scipy.signal as ssg
 import scipy.ndimage.filters as snf
-import IQMFeatures as iqm
+import galbally_iqm_features as iqm
 import bob.ip.base
 import bob.ip.color
 

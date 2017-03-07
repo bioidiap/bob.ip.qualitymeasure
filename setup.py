@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
-# Andre Anjos <andre.anjos@idiap.ch>
-# Tue 16 Feb 2016 15:26:26 CET
+# Sushil Bhattacharjee <sushil.bhattacharjee@idiap.ch>
+# Tue 7 Mar 2017 11:26:26 CET
 
 from setuptools import setup, find_packages, dist
 dist.Distribution(dict(setup_requires=['bob.extension']))
@@ -13,14 +13,14 @@ version = open("version.txt").read().rstrip()
 
 setup(
 
-    name='bob.ip.qualitymeeasure',
+    name='bob.ip.qualitymeasure',
     version=version,
     description='Image-quality feature-extractors for PAD applications',
     url='http://gitlab.idiap.ch/bob/bob.ip.qualitymeasure',
     license='BSD',
-    author='Andre Anjos',
-    author_email='andre.anjos@idiap.ch',
-    keywords='bob, mage-quality, face',
+    author='Sushil Bhattacharjee',
+    author_email='sushil.bhattacharjee@idiap.ch',
+    keywords='bob, image-quality, face',
     maintainer="Sushil Bhattacharjee",
     maintainer_email="sbhatta@idiap.ch",
     long_description=open('README.rst').read(),

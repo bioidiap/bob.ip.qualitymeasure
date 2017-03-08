@@ -34,7 +34,7 @@ setup(
     entry_points={
       # scripts should be declared using this entry:
       'console_scripts': [
-        'detect_landmarks.py = bob.ip.facelandmarks.script.detect_landmarks:main',
+        'compute_qualityfeatures.py = bob.ip.qualitymeasure.script.compute_qualitymeasures:main',
       ],
     },
 

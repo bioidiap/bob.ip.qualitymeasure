@@ -91,12 +91,12 @@ def sobelEdgeMap(image, orientation='both'):
     refSobelX = refSobel_sep[0,:,:]
     refSobelY = refSobel_sep[1,:,:]
     if orientation is 'horizontal':
-        refEdge = iqm.edgeThinning(refSobelX[:,:], refSobelX[:,:], thinning)
+        refEdge = iqm.edge_thinning(refSobelX[:,:], refSobelX[:,:], thinning)
     else:
         if orientation is 'vertical':
-            refEdge = iqm.edgeThinning(refSobelY[:,:], refSobelY[:,:], thinning)
+            refEdge = iqm.edge_thinning(refSobelY[:,:], refSobelY[:,:], thinning)
         else:
-            refEdge = iqm.edgeThinning(refSobelX[:,:], refSobelY[:,:], thinning)
+            refEdge = iqm.edge_thinning(refSobelX[:,:], refSobelY[:,:], thinning)
             
 
     return refEdge
@@ -106,7 +106,8 @@ def sobelEdgeMap(image, orientation='both'):
 '''
 '''
 #def computeMsuIQAFeatures(rgbImage, printFV=False):
-def computeMsuIQAFeatures(rgbImage):
+def compute_msu_iqa_features(rgbImage):
+    print("computing msu iqa features")
     assert len(rgbImage.shape)==3, 'computeMsuIQAFeatures():: image should be a 3D array (containing a rgb image)'
 #     hsv = np.zeros_like(rgbImage)
 #     bob.ip.color.rgb_to_hsv(rgbImage, hsv)
@@ -115,7 +116,7 @@ def computeMsuIQAFeatures(rgbImage):
 #     v = hsv[2,:,:]
     h,s,v = matlab_rgb2hsv(rgbImage) #defined above. Calls Bob's rgb_to_hsv() after rescaling the input image.
     
-    #print "computeMsuIQAFeatures():: check bob.ip.color.rgb_to_hsv conversion"
+    #print "compute_msu_iqa_features():: check bob.ip.color.rgb_to_hsv conversion"
     grayImage = np.zeros_like(h, dtype='uint8')
     bob.ip.color.rgb_to_gray(rgbImage, grayImage)
     
@@ -147,7 +148,8 @@ def computeMsuIQAFeatures(rgbImage):
     momentFeats = np.hstack((momentFeats, momentFeatsV))
     
     fv = momentFeats.copy()
-    #print 'moment features:', fv
+    #print('moment features: ')
+    #print(fv)
     
     fv = np.hstack((fv, colorHist))
     fv = np.hstack((fv, totNumColors))
@@ -367,7 +369,7 @@ def rgbhist(image, maxval, nBins, normType=0):
     
     for i in range(0, numPix):          # for i=1:size(I,1)*size(I,2)
         p = (im[i,:]).astype(float)     # p = double(im(i,:));
-        p = np.floor(p/decimator)       # p = floor(p/(maxval/nBins))+1;
+        p = (np.floor(p/decimator)).astype(np.uint32)       # p = floor(p/(maxval/nBins))+1;
         H[p[0], p[1], p[2]] += 1        # H(p(1),p(2),p(3)) = H(p(1),p(2),p(3)) + 1;
                                         # end
     #totalNBins = np.prod(H.shape)

@@ -34,24 +34,24 @@ def computeVideoIQM(video4d):
     print(rgbFrame.shape)
     iqmSet = iqm.compute_quality_features(rgbFrame)     #iqmSet = iqm.compute_quality_features(grayFrame)
     numIQM = len(iqmSet)
+    print(numIQM)
     iqaSet = iqa.compute_msu_iqa_features(rgbFrame)
     numIQA = len(iqaSet)
+    print(numIQA)
+    print(iqaSet.shape)
+    print(iqmSet.shape)
 
     #now initialize fset to store iqm features for all frames of input video.
     bobfset = np.zeros([numframes, numIQM])
-    bobQFeats = np.asarray(iqmSet) # compute_quality_features() returns a tuple
-    bobfset[f] = bobQFeats
+    bobfset[f] = iqmSet
     msufset = np.zeros([numframes, numIQA])
-    msuQFeats = np.asarray(iqaSet) 
-    msufset[f] = msuQFeats
+    msufset[f] = iqaSet
     
     for f in range(1,numframes):
         print('frame #: %d' %f)
         rgbFrame = video4d[f]
         print(rgbFrame.shape)
-#        grayFrame = matlab_rgb2gray(rgbFrame) #compute gray-level image for input color-frame
-#        bobQFeats = np.asarray(iqm.compute_quality_features(grayFrame)) # computeQualityFeatures() returns a tuple
-        bobQFeats = np.asarray(iqm.compute_quality_features(rgbFrame)) # computeQualityFeatures() returns a tuple
+        bobQFeats = iqm.compute_quality_features(rgbFrame) 
         msuQFeats  = iqa.compute_msu_iqa_features(rgbFrame)
         bobfset[f] = bobQFeats
         msufset[f] = msuQFeats

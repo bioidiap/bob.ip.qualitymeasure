@@ -188,7 +188,7 @@ def image_quality_measures(refImage, testImage):
     #26 HLFI: high-low frequency index (implemented as done by Galbally in Matlab).
     hlfi25=high_low_freq_index(fftRef, refImage.shape[1])
     
-    return (mse00, psnr01, ad02, sc03, nk04, md05, lmse06, nae07, snrv08, ramdv09, mas10, mams11, sme12, gme16, gpe17, ssim18, vif19, hlfi25)
+    return np.asarray((mse00, psnr01, ad02, sc03, nk04, md05, lmse06, nae07, snrv08, ramdv09, mas10, mams11, sme12, gme16, gpe17, ssim18, vif19, hlfi25), dtype=np.float32)
 
 
 """

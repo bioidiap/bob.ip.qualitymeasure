@@ -103,48 +103,51 @@ def sobelEdgeMap(image, orientation='both'):
 
 
 '''
+main function to call
 '''
 def compute_msu_iqa_features(rgbImage):
-#     print("computing msu iqa features")
+    """Computes image-quality features for the given input color (RGB) image.
+
+    Parameters:
+
+    rgbImage (:py:class:`numpy.ndarray`): A ``uint8`` array with 3 dimensions, representing the RGB input image of shape [3,M,N] (M rows x N cols).
+    
+    Returns:
+
+    featSet (:py:class:`numpy.ndarray`): a 1D numpy array of 121 float32 scalars.
+    This function returns the image-quality features (for face anti-spoofing) that have been 
+    described by Wen et al. in their paper:
+    "Face  spoof  detection  with  image distortion analysis", 
+    IEEE Trans. on Information Forensics and Security, vol. 10(4), pp. 746-761, April 2015.
+    """
+                                    
     assert len(rgbImage.shape)==3, 'compute_msu_iqa_features():: image should be a 3D array (containing a rgb image)'
-#     hsv = np.zeros_like(rgbImage)
-#     bob.ip.color.rgb_to_hsv(rgbImage, hsv)
-#     h = hsv[0,:,:]
-#     s = hsv[1,:,:]
-#     v = hsv[2,:,:]
     h,s,v = matlab_rgb2hsv(rgbImage) #defined above. Calls Bob's rgb_to_hsv() after rescaling the input image.
     
-    #print "compute_msu_iqa_features():: check bob.ip.color.rgb_to_hsv conversion"
     grayImage = np.zeros_like(h, dtype='uint8')
     bob.ip.color.rgb_to_gray(rgbImage, grayImage)
     
+    # compute blur-features
     blurFeat = blurriness(grayImage)
-#     print 'blurriness:', blurFeat
     
     pinaBlur = marzilianoBlur(grayImage)
     pinaBlur /= 30.0
-#     print 'pinaBlur:',pinaBlur
     
+    # compute color-diversity features
     colorHist, totNumColors = calColorHist(rgbImage)
     totNumColors /= 2000.0 #as done in Matlab code provided by MSU.
-#     print "color hist shape:", colorHist.shape
-#     print colorHist[0:11]
-#     print 'totNumColors', totNumColors
     
     # calculate mean, deviation and skewness of each channel
     # use histogram shifting for the hue channel
-#     print h.shape
     momentFeatsH = calmoment_shift(h)
-#     print 'H-moments:', momentFeatsH
         
     momentFeats = momentFeatsH.copy()
     momentFeatsS = calmoment(s)
-#     print 'S-moments:', momentFeatsS
     momentFeats = np.hstack((momentFeats, momentFeatsS))
     momentFeatsV = calmoment(v)
-#     print 'V-moments:', momentFeatsV
     momentFeats = np.hstack((momentFeats, momentFeatsV))
 
+    # compute the image-specularity features
     speckleFeats = compute_iqa_specularity_features(rgbImage, startEps=0.06)
     
     #stack the various feature-values in the same order as in MSU's matlab code.
@@ -155,8 +158,6 @@ def compute_msu_iqa_features(rgbImage):
     fv = np.hstack((fv, totNumColors))
     fv = np.hstack((fv, blurFeat))
     fv = np.hstack((fv, pinaBlur))
-
-#     print('computed msu features')
 
     return fv
 
@@ -177,7 +178,6 @@ def compute_iqa_specularity_features(rgbImage, startEps=0.05):
     speckleMean = np.mean(speckleImg)
     lowSpeckleThresh = speckleMean*1.5      #factors 1.5 and 4.0 are proposed by Wen et al. in their paper and matlab code.
     hiSpeckleThresh = speckleMean*4.0
-    #     print speckleMean, lowSpeckleThresh, hiSpeckleThresh
     specklePixels = speckleImg[np.where(np.logical_and(speckleImg >= lowSpeckleThresh, speckleImg<hiSpeckleThresh))]
 
     r = float(specklePixels.flatten().shape[0])/(speckleImg.shape[0]*speckleImg.shape[1]) #percentage of specular pixels in image

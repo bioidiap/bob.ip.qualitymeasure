@@ -28,15 +28,21 @@ Main function to be called, to extract a set of image quality-features computed 
 """
 def compute_quality_features(image):
     """Extract a set of image quality-features computed for the input image.
-    :param image: 2d or 3d numpy array. Should represent input image of shape [M,N] (M rows x N cols).
-    If 2D, image should contain a gray-image of shape [M,N].
-    If 3d, image should have a shape [3,M,N], and should contain an RGB-image.
 
-    :return featSet: a tuple of float-scalars, each representing one image-quality measure.
+    Parameters:
+
+    image (:py:class:`numpy.ndarray`): A ``uint8`` array with 2 or 3 dimensions, representing the input image of shape [M,N] (M rows x N cols).
+    If 2D, image should contain a gray-image of shape [M,N].
+    If 3D, image should have a shape [3,M,N], and should contain an RGB-image.
+
+
+    Returns:
+
+    featSet (:py:class:`numpy.ndarray`): a 1D numpy array of 18 float32 scalars, each representing one image-quality measure.
     This function returns a subset of the image-quality features (for face anti-spoofing) that have been 
     described by Galbally et al. in their paper:
     "Image Quality Assessment for Fake Biometric Detection: Application to Iris, Fingerprint, and Face Recognition",
-     IEEE Trans. on Image Processing Vol 23(2), 2014.
+    IEEE Trans. on Image Processing Vol 23(2), 2014.
     """
     gray_image = None
     #print("shape of input image:")
@@ -226,11 +232,17 @@ Ref:Z. Wang, A.C. Bovik, H.R. Sheikh and E.P. Simoncelli:
 """
 def ssim(refImage, testImage):
     """Compute and return SSIM between two images.
-    @param refImage: 2D numpy array (reference image)
-    @param testImage: 2D numpy array (test image)
+
+    Parameters:
+
+    refImage: 2D numpy array (reference image)
+    testImage: 2D numpy array (test image)
+
+    Returns:
+
     Returns ssim and ssim_map
-     @return ssim: float-scalar. The mean structural similarity between the 2 input images.
-    @return ssim_map: the SSIM index map of the test image (this map is smaller than the test image).
+    ssim: float-scalar. The mean structural similarity between the 2 input images.
+    ssim_map: the SSIM index map of the test image (this map is smaller than the test image).
     """
     M=refImage.shape[0]
     N=refImage.shape[1]

@@ -28,9 +28,9 @@
 You can used this Bob package to extract image-quality features for face-PAD applications.
 Two sets of quality-features are implemented in this package:
 
-1. The image-quality measures proposed by Galbally et al. (TIFS 2014), and
+1. The image-quality measures proposed by Galbally et al. (IEEE TIP 2014), and
 
-2. The image-quality features proposed by Wen et al. (TIFS 2015).
+2. The image-quality features proposed by Wen et al. (IEEE TIFS 2015).
 
 The package includes separate modules for implementing the two feature-sets.
 The module ``galbally_iqm_features`` implements the features proposed by Gabally et al., and the module ``msu_iqa_features`` implements the features proposed by Wen et al. 
@@ -49,7 +49,7 @@ The function ``compute_quality_features()`` (in the module galbally_iqm_features
 proposed by Galbally et al. Note that Galbally et al. proposed 25 features in their paper. This package implements the following
 18 features from their paper, namely: 
 [mse, psnr, ad, sc, nk, md, lmse, nae, snrv, ramdv, mas, mams, sme, gme, gpe, ssim, vif, hlfi].
-The function ``galbally_iqm_features::compute_quality_features()`` returns a 18-D numpy array, containing the feature-values in the order listed above.
+The function ``galbally_iqm_features::compute_quality_features()`` returns a 1D numpy array of length 18, containing the feature-values in the order listed above.
 
 .. doctest::
 
@@ -69,8 +69,8 @@ Therefore, the function ``galbally_iqm_features::compute_quality_features()`` ta
 or a gray-level image.
 (The input image should be a numpy-array. RGB color-images should be in the format expected by Bob_.)
 When the input image is 3-dimensional, the first dimension being '3' (as is the case in the example above), the input
-is considered to represent a color RGB image, and is first converted to a gray-level image.
-If the input is 2-dimensional (say, a numpy array of shape [480, 720]), then it is considered to represent a gray-level
+is assumed to represent a color RGB image, and is first converted to a gray-level image.
+If the input is 2-dimensional (say, a numpy array of shape [480, 720]), then it is assumed to represent a gray-level
 image, and the RGB-to-gray conversion step is skipped. 
 
 

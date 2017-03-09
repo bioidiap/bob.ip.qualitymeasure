@@ -22,7 +22,7 @@
 This package is part of the signal-processing and machine learning toolbox
 Bob_. It provides functions for extracting image-quality features proposed
 for PAD experiments by different research groups. Image quality measures
-proposed by Galbally et al (TIFS 2014) and by Wen et al. (TIFS 2015)
+proposed by Galbally et al (IEEE TIP 2014) and by Wen et al. (IEEE TIFS 2015)
 are implemented in this package.
 
 Installation

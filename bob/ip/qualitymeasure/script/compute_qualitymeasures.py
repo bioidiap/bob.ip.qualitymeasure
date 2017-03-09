@@ -29,17 +29,12 @@ def computeVideoIQM(video4d):
     
     #process first frame separately, to get the no. of iqm features
     f=0
-    #rgbFrame = video4d[f,:,:,:]
     rgbFrame = video4d[f]
-    print(rgbFrame.shape)
+    print('processing frame #: %d' %f)
     iqmSet = iqm.compute_quality_features(rgbFrame)     #iqmSet = iqm.compute_quality_features(grayFrame)
     numIQM = len(iqmSet)
-    print(numIQM)
     iqaSet = iqa.compute_msu_iqa_features(rgbFrame)
     numIQA = len(iqaSet)
-    print(numIQA)
-    print(iqaSet.shape)
-    print(iqmSet.shape)
 
     #now initialize fset to store iqm features for all frames of input video.
     bobfset = np.zeros([numframes, numIQM])
@@ -48,9 +43,9 @@ def computeVideoIQM(video4d):
     msufset[f] = iqaSet
     
     for f in range(1,numframes):
-        print('frame #: %d' %f)
+        print('processing frame #: %d' %f)
         rgbFrame = video4d[f]
-        print(rgbFrame.shape)
+#         print(rgbFrame.shape)
         bobQFeats = iqm.compute_quality_features(rgbFrame) 
         msuQFeats  = iqa.compute_msu_iqa_features(rgbFrame)
         bobfset[f] = bobQFeats
@@ -91,10 +86,12 @@ def main(command_line_parameters=None):
     (bobIqmFeats, msuIqaFeats) = computeIQM_1video(infile)
     #2. save features in file 
     outfile = args.outFile
+    print("Saving features in output file: %s" %outfile)
     ohf = bob.io.base.HDF5File(outfile, 'w')
     ohf.set('bobiqm', bobIqmFeats)
     ohf.set('msuiqa', msuIqaFeats)
     del ohf
+    print('Done')
     
 
 if __name__ == '__main__':

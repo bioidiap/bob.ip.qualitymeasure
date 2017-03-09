@@ -44,20 +44,20 @@ def compute_quality_features(image):
     if len(image.shape) == 3:
         if(image.shape[0]==3): 
             gray_image = matlab_rgb2gray(image) #compute gray-level image for input color-frame
-            print(gray_image.shape)
+#             print(gray_image.shape)
         else:
             print('error. Wrong kind of input image')
     else:
         if len(image.shape) == 2:
             gray_image = image
-            print(gray_image.shape)
+#             print(gray_image.shape)
         else:
             print('error -- wrong kind of input')
 
     if gray_image is not None: 
 
         gwin = gauss_2d((3,3), 0.5) # set up the smoothing-filter
-        print("computing degraded version of image")
+#         print("computing degraded version of image")
         smoothed = ssg.convolve2d(gray_image, gwin, boundary='symm', mode='same') 
     
         """
@@ -67,7 +67,7 @@ def compute_quality_features(image):
         approach is that smoothing degrades a spoof-image more than it does a genuine image
         (see Galbally's paper referenced above).
         """
-        print("computing galbally quality features")
+#         print("computing galbally quality features")
         featSet = image_quality_measures(gray_image, smoothed)
     
         return featSet

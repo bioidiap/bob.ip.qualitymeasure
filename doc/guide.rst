@@ -40,13 +40,16 @@ The examples below show how to use the functions in the two modules.
 Note that both feature-sets are extracted from still-images. However, in face-PAD experiments, we typically process videos.
 Therefore, the examples below use a video as input, but show how to extract image-quality features for a single frame.
 
+Note also, that in the examples below, the input to the feature-extraction functions are full-frames. If you wish to extract features only for the face-region, you will have to first construct an image containing only the region of interest, and pass that as the parameter to the feature-extraction functions.
+
+
 Computing Galbally's image-quality measures
 -------------------------------------------
 The function ``compute_quality_features()`` (in the module galbally_iqm_features) can be used to compute 18 image-quality measures 
 proposed by Galbally et al. Note that Galbally et al. proposed 25 features in their paper. This package implements the following
 18 features from their paper, namely: 
 [mse, psnr, ad, sc, nk, md, lmse, nae, snrv, ramdv, mas, mams, sme, gme, gpe, ssim, vif, hlfi].
-Therefore, the function ``galbally_iqm_features::compute_quality_features()`` returns a tuple of 18 scalars, in the order listed above.
+The function ``galbally_iqm_features::compute_quality_features()`` returns a 18-D numpy array, containing the feature-values in the order listed above.
 
 .. doctest::
 
@@ -70,13 +73,14 @@ is considered to represent a color RGB image, and is first converted to a gray-l
 If the input is 2-dimensional (say, a numpy array of shape [480, 720]), then it is considered to represent a gray-level
 image, and the RGB-to-gray conversion step is skipped. 
 
-Computing Wen's image-quality measures
---------------------------------------
+
+Computing Wen's (MSU) image-quality measures
+--------------------------------------------
 The code below shows how to compute the image-quality features proposed by Wen et al. (Here, we refer to these features as
 'MSU features'.)
-These features are computed from a RGB color-image. The 2 feature-types (image-blur, color-diversity) all together form
-a 118-D feature-vector.
-The function ``compute_msu_iqa_features()`` (from the module ``msu_iqa_features``) returns a 1D numpy array of length 118.
+These features are computed from a RGB color-image. The 3 feature-types (specularity, image-blur, color-diversity) all together form
+a 121-D feature-vector.
+The function ``compute_msu_iqa_features()`` (from the module ``msu_iqa_features``) returns a 1D numpy array of length 121.
 
 .. doctest::
 
@@ -85,7 +89,7 @@ The function ``compute_msu_iqa_features()`` (from the module ``msu_iqa_features`
    >>> rgb_frame = video4d[0]
    >>> msuf_set = iqa.compute_msu_iqa_features(rgb_frame)
    >>> print(len(msuf_set))
-   118
+   121
 
 
 .. _Bob: https://www.idiap.ch/software/bob/ 

@@ -4,19 +4,17 @@ Created on 9 Feb 2016
 @author: sbhatta
 '''
 
-
-
 #import re
 #import os
 import math
-
 import numpy as np
 import scipy as sp
 import scipy.signal as ssg
 import scipy.ndimage.filters as snf
-import galbally_iqm_features as iqm
 import bob.ip.base
 import bob.ip.color
+import galbally_iqm_features as iqm
+import tan_specular_highlights as tsh
 
 ########## Utility functions ###########
 '''
@@ -103,12 +101,12 @@ def sobelEdgeMap(image, orientation='both'):
 
 ########### End of Aux. functions ##############
 
+
 '''
 '''
-#def computeMsuIQAFeatures(rgbImage, printFV=False):
 def compute_msu_iqa_features(rgbImage):
-    print("computing msu iqa features")
-    assert len(rgbImage.shape)==3, 'computeMsuIQAFeatures():: image should be a 3D array (containing a rgb image)'
+#     print("computing msu iqa features")
+    assert len(rgbImage.shape)==3, 'compute_msu_iqa_features():: image should be a 3D array (containing a rgb image)'
 #     hsv = np.zeros_like(rgbImage)
 #     bob.ip.color.rgb_to_hsv(rgbImage, hsv)
 #     h = hsv[0,:,:]
@@ -135,48 +133,76 @@ def compute_msu_iqa_features(rgbImage):
     
     # calculate mean, deviation and skewness of each channel
     # use histogram shifting for the hue channel
-    #print h.shape
+#     print h.shape
     momentFeatsH = calmoment_shift(h)
-    #print 'H-moments:', momentFeatsH
+#     print 'H-moments:', momentFeatsH
         
     momentFeats = momentFeatsH.copy()
     momentFeatsS = calmoment(s)
-    #print 'S-moments:', momentFeatsS
+#     print 'S-moments:', momentFeatsS
     momentFeats = np.hstack((momentFeats, momentFeatsS))
     momentFeatsV = calmoment(v)
-    #print 'V-moments:', momentFeatsV
+#     print 'V-moments:', momentFeatsV
     momentFeats = np.hstack((momentFeats, momentFeatsV))
+
+    speckleFeats = compute_iqa_specularity_features(rgbImage, startEps=0.06)
     
-    fv = momentFeats.copy()
-    #print('moment features: ')
-    #print(fv)
+    #stack the various feature-values in the same order as in MSU's matlab code.
+    fv = speckleFeats.copy()
     
+    fv = np.hstack((fv, momentFeats))
     fv = np.hstack((fv, colorHist))
     fv = np.hstack((fv, totNumColors))
     fv = np.hstack((fv, blurFeat))
     fv = np.hstack((fv, pinaBlur))
 
+#     print('computed msu features')
+
     return fv
 
 
-"""
-Implements the method proposed by Marziliano et al. for determining the average width of vertical edges, as a measure of blurredness in an image.
-This function is a Python version of the Matlab code provided by MSU.
+def compute_iqa_specularity_features(rgbImage, startEps=0.05):
+    """Returns three features characterizing the specularity present in input color image. 
+    First the specular and diffuse components of the input image are separated using the 
+    """
+                       
+    #separate the specular and diffuse components of input color image.
+    speckleFreeImg, diffuseImg, speckleImg = tsh.remove_highlights(rgbImage, startEps, verboseFlag=False)
+    #speckleImg contains the specular-component
+                                       
+    if len(speckleImg.shape)==3: 
+        speckleImg = speckleImg[0]    
+    speckleImg = speckleImg.clip(min=0)
+        
+    speckleMean = np.mean(speckleImg)
+    lowSpeckleThresh = speckleMean*1.5      #factors 1.5 and 4.0 are proposed by Wen et al. in their paper and matlab code.
+    hiSpeckleThresh = speckleMean*4.0
+    #     print speckleMean, lowSpeckleThresh, hiSpeckleThresh
+    specklePixels = speckleImg[np.where(np.logical_and(speckleImg >= lowSpeckleThresh, speckleImg<hiSpeckleThresh))]
 
-:param image: 2D gray-level (face) image
-:param regionMask: (optional) 2D matrix (binary image), where 1s mark the pixels belonging to a region of interest, and 0s indicate pixels outside ROI. 
-"""
-def marzilianoBlur(image):
+    r = float(specklePixels.flatten().shape[0])/(speckleImg.shape[0]*speckleImg.shape[1]) #percentage of specular pixels in image
+    m = np.mean(specklePixels)              #mean-specularity (of specular-pixels)
+    s =  np.std(specklePixels)              #std. of specularity (of specular-pixels)
+
+    return np.asarray((r,m/150.0,s/150.0), dtype=np.float32)           #scaling by factor of 150 is as done by Wen et al. in their matlab code.
+
+
+
+def marzilianoBlur(image): 
+    """Method proposed by Marziliano et al. for determining the average width of vertical edges, as a measure of blurredness in an image. 
+    (Reimplemented from the Matlab code provided by MSU.)
+
+    :param image: 2D gray-level (face) image 
+    :param regionMask: (optional) 2D matrix (binary image), where 1s mark the pixels belonging to a region of interest, and 0s indicate pixels outside ROI.  
+    """
+
     assert len(image.shape)==2, 'marzilianoBlur():: input image should be a 2D array (gray level image)'
        
     edgeMap = sobelEdgeMap(image, 'vertical')        # compute vertical edge-map of image using sobel 
     
     #There will be some difference between the result of this function and the Matlab version, because the
     #edgeMap produced by sobelEdgeMap() is not exactly the same as that produced by Matlab's edge() function.
-    
-#     Test edge-map generated in Matlab produces the same result as the matlab version of MarzilianoBlur().
-#     edgeMap = bob.io.base.load('/idiap/temp/sbhatta/msudb_faceEdgeMap.png')
-#     imshow(edgeMap)
+    #Test edge-map generated in Matlab produces the same result as the matlab version of MarzilianoBlur().
     
     blurImg = image
     C = blurImg.shape[1]    #number of cols in image
@@ -249,19 +275,14 @@ def marzilianoBlur(image):
     return blurMetric
 
 
-"""
-    returns the first 3 statistical moments (mean, standard-dev., skewness) and 2 other first-order statistical measures of input image 
-    :param channel: 2D array containing gray-image-like data
-"""
 def calmoment( channel, regionMask=None ):
+    """ returns the first 3 statistical moments (mean, standard-dev., skewness) and 2 other first-order statistical measures of input image 
+    :param channel: 2D array containing gray-image-like data 
+    """
+
     assert len(channel.shape) == 2, 'calmoment():: channel should be a 2D array (a single color-channel)'    
 
     t = np.arange(0.05, 1.05, 0.05) + 0.025                 # t = 0.05:0.05:1;
-#     t = np.arange(0.05, 1.05, 0.05) + 0.025                 # t = 0.05:0.05:1;
-#     np.insert(t, 0, -np.inf)
-#     t[-1]= np.inf
-#     print type(t)
-#     print t
 
     nPix = np.prod(channel.shape)                   # pixnum = length(channel(:));
     m = np.mean(channel)                            # m = mean(channel(:));

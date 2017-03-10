@@ -73,10 +73,10 @@ def remove_highlights(srcImage, startEps=0.5, verboseFlag=True):
     step=0.01
     
     while(epsilon>=0.0):
-        if verboseFlag: print '*'
+        if verboseFlag: print('*')
         diffuse, srcPixelStatus = iteration(diffuse, srcPixelStatus, sfi, epsilon, verboseFlag)
         epsilon -= step
-        if verboseFlag: print 'ep:', epsilon
+        if verboseFlag: print('ep: %f' % epsilon)
 
     speckleResidue = srcImage - diffuse
     
@@ -173,7 +173,7 @@ def iteration(src, srcPixelStatus, sfi, epsilon, verboseFlag=True):
         grn_chroma_diff_x = np.diff(srcChroma[1,:,:], axis=1)
         grn_chroma_diff_y = np.diff(srcChroma[1,:,:], axis=0)
     
-        if verboseFlag: print '.'
+        if verboseFlag: print('.')
         for y in range(maxY-1):
             for x in range(maxX-1):
                 if(srcPixelStatus[y,x] <> G_CAMERA_DARK):
@@ -495,7 +495,7 @@ def imshow(image):
     if len(image.shape)==3:
         #imshow() expects color image in a slightly different format, so first rearrange the 3d data for imshow...
         outImg = image.tolist()
-#         print len(outImg)
+#         print(len(outImg))
         result = np.dstack((outImg[0], outImg[1]))
         outImg = np.dstack((result, outImg[2]))
         plt.imshow((outImg*255.0).astype(np.uint8)) #[:,:,1], cmap=mpl.cm.gray)
@@ -505,7 +505,7 @@ def imshow(image):
             #display gray image.
             plt.imshow(image.astype(np.uint8), cmap=matplotlib.cm.gray)
         else:
-            print "inshow():: image should be either 2d or 3d."
+            print("inshow():: image should be either 2d or 3d.")
              
     plt.show()
     
@@ -524,7 +524,7 @@ def computeIQSpecularityFeatures(rgbImage, startEps=0.05):
     speckleMean = np.mean(speckleImg)
     lowSpeckleThresh = speckleMean*1.5
     hiSpeckleThresh = speckleMean*4.0
-    print speckleMean, lowSpeckleThresh, hiSpeckleThresh
+    print(speckleMean, lowSpeckleThresh, hiSpeckleThresh)
     specklePixels = speckleImg[np.where(np.logical_and(speckleImg > lowSpeckleThresh, speckleImg<hiSpeckleThresh))] #(speckleImg > lowSpeckleThresh and speckleImg<hiSpeckleThresh) #[np.where(lowSpeckleThresh < speckleImg and speckleImg<hiSpeckleThresh)]
     
     r = float(specklePixels.shape[0])/(speckleImg.shape[0]*speckleImg.shape[1])
@@ -549,7 +549,7 @@ def test_highlight_detection():
 
     speckleFreeImg, diffuseImg, speckleImg = remove_highlights(inpImage, startEps=0.05)
      
-    print 'saving output images'
+    print('saving output images')
     bob.io.base.save(speckleFreeImg.astype('uint8'), outRoot+'speckleFreeHeadImage.ppm')
 #     speckleFreeImg = np.rollaxis(np.rollaxis(speckleFreeImg, 0,-1),2,1)
 #     misc.imsave(outRoot+'speckleFreeHeadImage.ppm', speckleFreeImg.astype('uint8'))
@@ -564,7 +564,7 @@ def test_highlight_detection():
 #     
     
 #     r,m,s=computeIQSpecularityFeatures(inpImage, startEps=0.05)
-#     print r, m, s
+#     print(r, m, s)
 
 #    
 #    imshow(inpImage)

@@ -18,8 +18,8 @@ import bob.ip.color
 #from .utils import detect_landmarks, draw_landmarks, save_landmarks, Result
 #from .utils import detect_landmarks_on_boundingbox
 #from .script.detect_landmarks import main as app
-import galbally_iqm_features as iqm
-import msu_iqa_features as iqa
+from . import galbally_iqm_features as iqm
+from . import msu_iqa_features as iqa
 
 
 REF_VIDEO_FILE = 'real_client001_android_SD_scene01.mp4'

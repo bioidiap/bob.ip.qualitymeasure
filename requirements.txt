@@ -4,6 +4,7 @@ bob.extension
 bob.io.base
 bob.io.image
 bob.io.video
+bob.ip.base
 bob.ip.draw
 bob.ip.color
 numpy

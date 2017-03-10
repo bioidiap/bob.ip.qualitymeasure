@@ -9,8 +9,8 @@
 .. todolist::
 
 This package provides functions for extracting image-quality features for still, color images.
-Two sets of features are computed: the set of features proposed by Galbally et al.(TIFS2014),
-and the set of features proposed by Wen et al. (TIFS2015).
+Two sets of features are computed: the set of features proposed by Galbally et al.(IEEE TIP 2014),
+and the set of features proposed by Wen et al. (IEEE TIFS 2015).
 Note that not all features proposed by the authors of the papers are available in this package.
 
 

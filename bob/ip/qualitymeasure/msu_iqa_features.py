@@ -13,8 +13,8 @@ import scipy.signal as ssg
 import scipy.ndimage.filters as snf
 import bob.ip.base
 import bob.ip.color
-import galbally_iqm_features as iqm
-import tan_specular_highlights as tsh
+from . import galbally_iqm_features as iqm
+from . import tan_specular_highlights as tsh
 
 ########## Utility functions ###########
 '''

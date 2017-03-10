@@ -176,7 +176,7 @@ def iteration(src, srcPixelStatus, sfi, epsilon, verboseFlag=True):
         if verboseFlag: print('.')
         for y in range(maxY-1):
             for x in range(maxX-1):
-                if(srcPixelStatus[y,x] <> G_CAMERA_DARK):
+                if(srcPixelStatus[y,x] != G_CAMERA_DARK):
                     
                     drx = red_chroma_diff_x[y,x]
                     dgx = grn_chroma_diff_x[y,x]
@@ -322,9 +322,9 @@ def init_labels(src, sfi, epsilon, srcPixelStatus):
     for y in range(1, maxY-1):
         for x in range(1, maxX-1):
             pStat = srcPixelStatus[y,x]
-#             if pStat <> G_BOUNDARY and pStat <> G_NOISE and pStat <> G_CAMERA_DARK and pStat <> G_DIFFUSE:
+#             if pStat != G_BOUNDARY and pStat != G_NOISE and pStat != G_CAMERA_DARK and pStat != G_DIFFUSE:
             if pStat not in (G_BOUNDARY, G_NOISE, G_CAMERA_DARK, G_DIFFUSE):
-                #Robby Tan's original C++ code doesn't check for pStat<>G_DIFFUSE, but this speeds up the processing a lot, and doesn't seem to affect the results.
+                #Robby Tan's original C++ code doesn't check for pStat!=G_DIFFUSE, but this speeds up the processing a lot, and doesn't seem to affect the results.
                 if   dlogx[y,x] > epsilon:
                     pStat = G_SPECULARX
                     count+=1
@@ -389,7 +389,7 @@ def reset_labels(pixelLabels):
         pixelLabels: numpy array of shape (maxX, maxY) containing updated pixel-markers..
     """
     # to reset the label of the pixels
-    pixelLabels[np.where(pixelLabels <> G_CAMERA_DARK)] = 0
+    pixelLabels[np.where(pixelLabels != G_CAMERA_DARK)] = 0
 
     return pixelLabels
 

@@ -57,7 +57,7 @@ The function ``galbally_iqm_features::compute_quality_features()`` returns a 1D 
    >>> from bob.ip.qualitymeasure import galbally_iqm_features as iqm
    >>> video4d = bob.io.video.reader(video_file) # doctest: +SKIP
    >>> rgb_frame = video4d[0]
-   >>> print(len(rgb_frame))
+   >>> print(rgb_frame.shape)
    [3, 480, 720]
    >>> gf_set = iqm.compute_quality_features(rgb_frame)
    >>> print(len(gf_set))

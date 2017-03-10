@@ -308,7 +308,7 @@ def vif(refImage, testImage):
     #sc is scale, taking values (1,2,3,4)
     for sc in range(1,5):
         N=(2**(4-sc+1))+1
-        #print N, sc
+        #print(N, sc)
         win = gauss_2d((N,N), (float(N)/5.0))
         
         #ssg is scipy.signal
@@ -378,17 +378,17 @@ def high_low_freq_index(imgFFT, ncols):
     fftRes = imgFFT #np.fft.fft2(image)
     fftMag = np.abs(fftRes)
     totalEnergy = np.sum(fftMag)
-    #print totalEnergy
+    #print(totalEnergy)
     
     lowIdx = colHalf-lowFreqColHalf
     hiIdx = colHalf + lowFreqColHalf
-    #print lowIdx, hiIdx
+    #print(lowIdx, hiIdx)
     LowFreqMag = fftMag[:, lowIdx:hiIdx]
     lowFreqMagTotal = np.sum(LowFreqMag)
     
     fftMag[:, lowIdx:hiIdx]=0
     highFreqMagTotal = np.sum(fftMag)
-    #print 'partial freq. sums:', lowFreqMagTotal, highFreqMagTotal
+    #print('partial freq. sums: %f %f' %(lowFreqMagTotal, highFreqMagTotal))
     
     highLowFreqIQ = np.abs(lowFreqMagTotal - highFreqMagTotal)/float(totalEnergy)
     
@@ -447,8 +447,8 @@ def testRegionalMax():
     A[2,7]=45
     A[3,8]=44
     rm = regionalmax(A)
-    print A
-    print rm
+    print(A)
+    print(rm)
 
 """
 find local maxima using 3x3 mask.
@@ -536,25 +536,6 @@ def cornerMetric(image):
     return cornerness
     
 
-# 
-# def imshow(image):
-#     import matplotlib
-#     from matplotlib import pyplot as plt
-#     if len(image.shape)==3:
-#         #imshow() expects color image in a slightly different format, so first rearrange the 3d data for imshow...
-#         outImg = image.tolist()
-#         print len(outImg)
-#         result = np.dstack((outImg[0], outImg[1]))
-#         outImg = np.dstack((result, outImg[2]))
-#         plt.imshow((outImg*255.0).astype(np.uint8)) #[:,:,1], cmap=mpl.cm.gray)
-#         
-#     else:
-#         if(len(image.shape)==2):
-#             #display gray image.
-#             plt.imshow(image.astype(np.uint8), cmap=matplotlib.cm.gray)
-#             
-#     plt.show()
-
 '''
 compute the corner-based similarity between 2 images (how close are the numbers of corners found in the two images?).
 returns an index between 0 and 1. The smaller the better.
@@ -574,7 +555,7 @@ def corner_similarity(refImage, testImage):
     
     nCornersRef = np.sum(C_peaks)
     nCornersTest = np.sum(CG_peaks)
-    #print 'CornerSim::', nCornersRef, nCornersTest
+    #print('CornerSim:: %f %f', %(nCornersRef, nCornersTest) )
     
     maxCorners = max(nCornersRef, nCornersTest)
     
@@ -633,8 +614,6 @@ def edge_thinning(bx, by, thinning=1):
     n = by.shape[1]
     e = np.zeros([m,n], dtype=np.uint8)     # will contain the resulting edge-map.
     
-#     print 'bx', bx.shape
-#     print 'by', by.shape
     #compute the edge-strength from the 2 directional filter-responses
     b = np.sqrt(bx*bx + by*by)
     
@@ -807,7 +786,7 @@ def gaussianSmooth(image):
 # def testQualityMeasures(image, smoothed):
 #     frameFeatSet = imageQualityMeasures(image, smoothed)
 #     
-#     print frameFeatSet
+#     print(frameFeatSet)
 #     
 #     
 # if __name__ == '__main__':
@@ -817,8 +796,8 @@ def gaussianSmooth(image):
 #     diffImg = image - smoothed
 #     #test MAMS
 #     mas, mams = angle_similarity2(image, smoothed, diffImg)
-#     print 'mas', mas
-#     print 'mams', mams
+#     print('mas: %f' % mas)
+#     print('mams: %f' % mams)
 
 
     

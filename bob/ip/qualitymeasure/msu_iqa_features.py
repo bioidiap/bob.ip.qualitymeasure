@@ -59,7 +59,7 @@ def imshow(image):
     if len(image.shape)==3:
         #imshow() expects color image in a slightly different format, so first rearrange the 3d data for imshow...
         outImg = image.tolist()
-        print len(outImg)
+        print(len(outImg))
         result = np.dstack((outImg[0], outImg[1]))
         outImg = np.dstack((result, outImg[2]))
         plt.imshow((outImg*255.0).astype(np.uint8)) #[:,:,1], cmap=mpl.cm.gray)
@@ -215,19 +215,19 @@ def marzilianoBlur(image):
     #     ind = np.lexsort((row,col))
     #     row = row[ind]
     #     col = col[ind]
-        #print 'lexsort_col:', 1+col
-        #print 'lexsort_row:', 1+row
+        #print('lexsort_col: %d' % (1+col))
+        #print('lexsort_row: %d' % (1+row))
         #This was only used for debugging (to compare with Matlab code). In fact it is not necessary, so it is commented out.
     
         
         edgeWidths = np.zeros_like(row, dtype=int)
         
         firstRow = row[0]
-    #     print 'firstRow:',firstRow
+    #     print('firstRow: %d' % firstRow)
         for i in range(len(row)):
             rEdge = row[i]
             cEdge = col[i]
-    #         if rEdge == firstRow: print "edgePoints:", (i, rEdge, cEdge)
+    #         if rEdge == firstRow: print("edgePoints: %d %d %d" % (i, rEdge, cEdge))
             
             cStart = 0          # instead of setting them to 'inf' as in MSU's Matlab version
             cEnd = 0       
@@ -288,22 +288,20 @@ def calmoment( channel, regionMask=None ):
     m = np.mean(channel)                            # m = mean(channel(:));
     d = np.std(channel)                             # d = sqrt(sum((channel(:) - m) .^ 2) / pixnum);
     s = np.sum(np.power( ((channel - m)/d), 3))/nPix  # s = sum(((channel(:) - m) ./ d) .^ 3) / pixnum;
-    #print 't:', t
+    #print(t)
     myHH = np.histogram(channel, t)[0]
-    #print myHH
+    #print(myHH)
     hh = myHH.astype(float)/nPix              # hh = hist(channel(:),t) / pixnum;
-    #print 'numPix:', nPix
-    #print 'histogram:',hh
+    #print('numPix: %d' % nPix)
     
     #H = np.array([m,d,s, np.sum(hh[0:1]), np.sum(hh[-2:-1])])  # H = [m d s sum(hh(1:2)) sum(hh(end-1:end))];
     H= np.array([m,d,s])
     s0 = np.sum(hh[0:2])
-    #print s0
+    #print(s0)
     H = np.hstack((H,s0))
     s1 = np.sum(hh[-2:])
-    #print s1
+    #print(s1)
     H = np.hstack((H, s1) )
-    #print 'calmoment:',H.shape
     
     return H
 
@@ -343,7 +341,6 @@ def calColorHist(image, m=100):
     #1. compute color histogram of image (normalized, if specified)
     numBins = 32
     maxval=255
-    #print "calColorHist():: ", image.shape
     cHist = rgbhist(image, maxval, numBins, 1)
 
     #2. determine top 100 colors of image from histogram
@@ -352,10 +349,8 @@ def calColorHist(image, m=100):
     cHist=y[0:m]                    # H = Y(1:m)';
 
     c = np.cumsum(y)                # C = cumsum(Y);
-#     print 'cumsum shape:', c.shape
 #     thresholdedC = np.where(c>0.999)
-#    # print thresholdedC.shape
-#     print 'thresholdedC:', thresholdedC[0][0] #:200]
+#     print('thresholdedC: %f' % thresholdedC[0][0])  #:200]
     numClrs = np.where(c>0.99)[0][0]    # clrnum = find(C>.99,1,'first') - 1;
     
     cHist = np.array(cHist)
@@ -371,17 +366,16 @@ def rgbhist(image, maxval, nBins, normType=0):
     H = np.zeros((nBins, nBins, nBins), dtype=np.uint32)  # zeros([nBins nBins nBins]);
 
 #     testImage = image[:,0:3,0:3].copy()
-#     print testImage.shape
-#     print image.shape
-#     print testImage[0,:,:]
-#     print ''
-#     print testImage[1,:,:]
-#     print ''
-#     print testImage[2,:,:]
-#     print ''
-#     print testImage.reshape(3, 9, order='C').T
+#     print(testImage.shape)
+#     print(image.shape)
+#     print(testImage[0,:,:])
+#     print('')
+#     print(testImage[1,:,:])
+#     print('')
+#     print(testImage[2,:,:])
+#     print('')
+#     print(testImage.reshape(3, 9, order='C').T)
 #     
-#     assert(0>1), "Stop!"
     
     decimator = (maxval+1)/nBins
     numPix = image.shape[1]*image.shape[2]
@@ -396,8 +390,8 @@ def rgbhist(image, maxval, nBins, normType=0):
     #totalNBins = np.prod(H.shape)
     #H = H.reshape(totalNBins, 1, order='F') same as H = reshape(H, nBins**3, 1)
     H = H.ravel()        #H = H(:);
-#     print 'H type:',type(H[0])
-#     print H.shape
+#     print('H type: %s' %(type(H[0]))
+#     print(H.shape)
     # Un-Normalized histogram
     
     if normType ==1: H =  H.astype(np.float32) / np.sum(H)    # l1 normalization

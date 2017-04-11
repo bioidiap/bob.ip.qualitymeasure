@@ -2,6 +2,8 @@
 .. Sushil Bhattacharjee <sushil.bhattacharjee@idiap.ch>
 .. Tue 08 Mar 2017 15:42:29 CET
 
+.. _bob.ip.qualitymeasure:
+
 ===============================================================
  Bob's Routines for Image-Quality Measures for PAD Applications
 ===============================================================

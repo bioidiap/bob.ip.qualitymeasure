@@ -130,10 +130,7 @@ def specular_free_image(src, srcPixelStatus=None):
             ":: srcPixelStatus should be None, or should match the " \
             "pixel-layout of src."
 
-    for y in range(src.shape[1]):
-        for x in range(src.shape[2]):
-            if np.all(src[:, y, x] < camDark):
-                srcPixelStatus[y, x] = G_CAMERA_DARK
+    srcPixelStatus[np.logical_and.reduce(src < camDark, 0)] = G_CAMERA_DARK
 
     srcMaxChroma, srcMax, srcTotal = max_chroma(src)
 
@@ -181,10 +178,9 @@ def iteration(src, srcPixelStatus, sfi, epsilon, verboseFlag=True):
     count, srcPixelStatus = init_labels(src, sfi, epsilon, srcPixelStatus)
 
     while(1):
+        maxY, maxX = src.shape[-2:]
         srcMaxChroma, srcMax, srcTotal = max_chroma(src)
         srcChroma, srcTotal = rgb_chroma(src, srcTotal)
-        maxY = src.shape[1]
-        maxX = src.shape[2]
 
         red_chroma_diff_x = np.diff(srcChroma[0, :, :], axis=1)
         red_chroma_diff_y = np.diff(srcChroma[0, :, :], axis=0)
@@ -192,119 +188,248 @@ def iteration(src, srcPixelStatus, sfi, epsilon, verboseFlag=True):
         grn_chroma_diff_x = np.diff(srcChroma[1, :, :], axis=1)
         grn_chroma_diff_y = np.diff(srcChroma[1, :, :], axis=0)
 
-        # if verboseFlag:
-        #     print('.')
+        # a non-complete attempt to remove the for loop below
+        # # find non G_CAMERA_DARK pixels
+        # non_g_camera_dark = (srcPixelStatus != G_CAMERA_DARK)
+        # non_g_camera_dark[-1, :] = False
+        # non_g_camera_dark[:, -1] = False
+        # g_specularx = (non_g_camera_dark) & \
+        #     (srcPixelStatus == G_SPECULARX)
+        # g_speculary = (non_g_camera_dark) & \
+        #     (srcPixelStatus == G_SPECULARY)
+
+        # '''for specular y'''
+
+        # # if it is a boundary in x
+        # boundary_x = np.zeros_like(g_specularx)
+        # boundary_x[:-1, :-1] = g_specularx[:-1, :-1] & \
+        #     (np.fabs(red_chroma_diff_x[:-1, :]) > thR) & \
+        #     (np.fabs(grn_chroma_diff_x[:-1, :]) > thG)
+        # srcPixelStatus[boundary_x] = G_BOUNDARY
+
+        # # if it is noise in x
+        # srcMaxChromaDiffX = np.diff(srcMaxChroma, axis=1)
+        # srcMaxChromaAbsDiffX = np.fabs(srcMaxChromaDiffX)
+        # noise_mask_x = g_specularx & (~boundary_x)
+        # noise_mask_x[:-1, :-1] = noise_mask_x[:-1, :-1] & \
+        #     (srcMaxChromaAbsDiffX[:-1, :] < 0.01)
+        # srcPixelStatus[noise_mask_x] = G_NOISE
+
+        # # if it is a boundary in x
+        # boundary_y = np.zeros_like(g_speculary)
+        # boundary_y[:-1, :-1] = g_speculary[:-1, :-1] & \
+        #     (np.fabs(red_chroma_diff_y[:, :-1]) > thR) & \
+        #     (np.fabs(grn_chroma_diff_y[:, :-1]) > thG)
+        # srcPixelStatus[boundary_y] = G_BOUNDARY
+
+        # # if it is noise in x
+        # srcMaxChromaDiffY = np.diff(srcMaxChroma, axis=0)
+        # srcMaxChromaAbsDiffY = np.fabs(srcMaxChromaDiffY)
+        # noise_mask_y = g_speculary & (~boundary_y)
+        # noise_mask_y[:-1, :-1] = noise_mask_y[:-1, :-1] & \
+        #     (srcMaxChromaAbsDiffY[:, :-1] < 0.01)
+        # srcPixelStatus[noise_mask_y] = G_NOISE
+
+        # # if it is not noise or boundary
+        # boundary_x = np.zeros_like(g_specularx)
+        # boundary_x[:-1, :-1] = g_specularx[:-1, :-1] & \
+        #     (np.fabs(red_chroma_diff_x[:-1, :]) > thR) & \
+        #     (np.fabs(grn_chroma_diff_x[:-1, :]) > thG)
+        # srcMaxChromaDiffX = np.diff(srcMaxChroma, axis=1)
+        # srcMaxChromaAbsDiffX = np.fabs(srcMaxChromaDiffX)
+        # noise_mask_x = g_specularx & (~boundary_x)
+        # noise_mask_x[:-1, :-1] = noise_mask_x[:-1, :-1] & \
+        #     (srcMaxChromaAbsDiffX[:-1, :] < 0.01)
+        # non_noise_mask_x = g_specularx & (~boundary_x) & (~noise_mask_x)
+        # srcPixelStatus[non_noise_mask_x] = G_DIFFUSE
+        # non_noise_mask_next_x = np.roll(non_noise_mask_x, 1, axis=1)
+        # srcPixelStatus[non_noise_mask_next_x] = G_DIFFUSE
+
+        # boundary_y = np.zeros_like(g_speculary)
+        # boundary_y[:-1, :-1] = g_speculary[:-1, :-1] & \
+        #     (np.fabs(red_chroma_diff_y[:, :-1]) > thR) & \
+        #     (np.fabs(grn_chroma_diff_y[:, :-1]) > thG)
+        # srcMaxChromaDiffY = np.diff(srcMaxChroma, axis=0)
+        # srcMaxChromaAbsDiffY = np.fabs(srcMaxChromaDiffY)
+        # noise_mask_y = g_speculary & (~boundary_y)
+        # noise_mask_y[:-1, :-1] = noise_mask_y[:-1, :-1] & \
+        #     (srcMaxChromaAbsDiffY[:, :-1] < 0.01)
+        # non_noise_mask_y = g_speculary & (~boundary_y) & (~noise_mask_y)
+        # srcPixelStatus[non_noise_mask_y] = G_DIFFUSE
+        # non_noise_mask_next_y = np.roll(non_noise_mask_y, 1, axis=0)
+        # srcPixelStatus[non_noise_mask_next_y] = G_DIFFUSE
+
+        # # if it is not boundary or noise
+        # pos_chroma_maskx = (srcMaxChromaDiffX[:-1, :] > 0)
+        # reduce_mask_pos_x = non_noise_mask_x.copy()
+        # reduce_mask_pos_x[:-1, :-1] = reduce_mask_pos_x[:-1, :-1] & \
+        #     pos_chroma_maskx
+        # reduce_mask_pos_next_x = np.roll(reduce_mask_pos_x, 1, axis=1)
+        # iro = np.moveaxis(np.moveaxis(src, 0, -1)[reduce_mask_pos_x], -1, 0)
+        # refMaxChroma = srcMaxChroma[reduce_mask_pos_next_x]
+        # iroTotal = srcTotal[reduce_mask_pos_x]
+        # iroMax = srcMax[reduce_mask_pos_x]
+        # iroMaxChroma = srcMaxChroma[reduce_mask_pos_x]
+        # pStat, iroRes = specular_to_diffuse_vectorized(
+        #     iro, iroMax, iroMaxChroma, iroTotal, refMaxChroma)
+        # iro[:, pStat != G_NOISE] = iroRes[:, pStat != G_NOISE]
+
+        # pos_chroma_maskx = ~pos_chroma_maskx
+        # reduce_mask_pos_x = non_noise_mask_x.copy()
+        # reduce_mask_pos_x[:-1, :-1] = reduce_mask_pos_x[:-1, :-1] & \
+        #     pos_chroma_maskx
+        # reduce_mask_pos_next_x = np.roll(reduce_mask_pos_x, 1, axis=1)
+        # iro = np.moveaxis(np.moveaxis(src, 0, -1)[reduce_mask_pos_next_x],
+        #                   -1, 0)
+        # refMaxChroma = srcMaxChroma[reduce_mask_pos_x]
+        # iroTotal = srcTotal[reduce_mask_pos_next_x]
+        # iroMax = srcMax[reduce_mask_pos_next_x]
+        # iroMaxChroma = srcMaxChroma[reduce_mask_pos_next_x]
+        # pStat, iroRes = specular_to_diffuse_vectorized(
+        #     iro, iroMax, iroMaxChroma, iroTotal, refMaxChroma)
+        # iro[:, pStat != G_NOISE] = iroRes[:, pStat != G_NOISE]
+
+        # # if it is not boundary or noise
+        # pos_chroma_masky = (srcMaxChromaDiffY[:, :-1] > 0)
+        # reduce_mask_pos_y = non_noise_mask_y.copy()
+        # reduce_mask_pos_y[:-1, :-1] = reduce_mask_pos_y[:-1, :-1] & \
+        #     pos_chroma_masky
+        # reduce_mask_pos_next_y = np.roll(reduce_mask_pos_y, 1, axis=1)
+        # iro = np.moveaxis(np.moveaxis(src, 0, -1)[reduce_mask_pos_y], -1, 0)
+        # refMaxChroma = srcMaxChroma[reduce_mask_pos_next_y]
+        # iroTotal = srcTotal[reduce_mask_pos_y]
+        # iroMax = srcMax[reduce_mask_pos_y]
+        # iroMaxChroma = srcMaxChroma[reduce_mask_pos_y]
+        # pStat, iroRes = specular_to_diffuse_vectorized(
+        #     iro, iroMax, iroMaxChroma, iroTotal, refMaxChroma)
+        # iro[:, pStat != G_NOISE] = iroRes[:, pStat != G_NOISE]
+
+        # pos_chroma_masky = ~pos_chroma_masky
+        # reduce_mask_pos_y = non_noise_mask_y.copy()
+        # reduce_mask_pos_y[:-1, :-1] = reduce_mask_pos_y[:-1, :-1] & \
+        #     pos_chroma_masky
+        # reduce_mask_pos_next_y = np.roll(reduce_mask_pos_y, 1, axis=1)
+        # iro = np.moveaxis(np.moveaxis(src, 0, -1)[reduce_mask_pos_next_y],
+        #                   -1, 0)
+        # refMaxChroma = srcMaxChroma[reduce_mask_pos_y]
+        # iroTotal = srcTotal[reduce_mask_pos_next_y]
+        # iroMax = srcMax[reduce_mask_pos_next_y]
+        # iroMaxChroma = srcMaxChroma[reduce_mask_pos_next_y]
+        # pStat, iroRes = specular_to_diffuse_vectorized(
+        #     iro, iroMax, iroMaxChroma, iroTotal, refMaxChroma)
+        # iro[:, pStat != G_NOISE] = iroRes[:, pStat != G_NOISE]
         for y in range(maxY - 1):
             for x in range(maxX - 1):
                 current_pixel = srcPixelStatus[y, x]
-                if(current_pixel != G_CAMERA_DARK):
+                if(current_pixel == G_CAMERA_DARK):
+                    continue
 
-                    drx = red_chroma_diff_x[y, x]
-                    dgx = grn_chroma_diff_x[y, x]
-                    dry = red_chroma_diff_y[y, x]
-                    dgy = grn_chroma_diff_y[y, x]
+                drx = red_chroma_diff_x[y, x]
+                dgx = grn_chroma_diff_x[y, x]
+                dry = red_chroma_diff_y[y, x]
+                dgy = grn_chroma_diff_y[y, x]
 
-                    if(current_pixel == G_SPECULARX):
-                        # if it is  a boundary in the x direction
-                        if((abs(drx) > thR) and (abs(dgx) > thG)):
-                            # pixel right
-                            srcPixelStatus[y, x] = G_BOUNDARY
-                            continue
-                        # if it is a noise
-                        elif (abs(srcMaxChroma[y, x] - srcMaxChroma[y, x + 1]) < 0.01):
-                            srcPixelStatus[y, x] = G_NOISE
-                            continue
-                        else:  # reduce the specularity at x direction
-                            if (srcMaxChroma[y, x] < srcMaxChroma[y, x + 1]):
-                                iro = src[:, y, x]
-                                pStat = current_pixel
-                                refMaxChroma = srcMaxChroma[y, x + 1]
-                                iroTotal = srcTotal[y, x]
-                                iroMax = srcMax[y, x]
-                                iroMaxChroma = srcMaxChroma[y, x]
-                                pStat, iroRes = specular_to_diffuse(
-                                    iro, iroMax, iroMaxChroma, iroTotal, refMaxChroma)
+                if(current_pixel == G_SPECULARX):
+                    # if it is  a boundary in the x direction
+                    if (abs(drx) > thR) and (abs(dgx) > thG):
+                        # pixel right
+                        srcPixelStatus[y, x] = G_BOUNDARY
+                        continue
+                    # if it is a noise
+                    if abs(srcMaxChroma[y, x] - srcMaxChroma[y, x + 1]) < 0.01:
+                        srcPixelStatus[y, x] = G_NOISE
+                        continue
+                    # reduce the specularity at x direction
+                    if srcMaxChroma[y, x] < srcMaxChroma[y, x + 1]:
+                        iro = src[:, y, x]
+                        # pStat = current_pixel
+                        refMaxChroma = srcMaxChroma[y, x + 1]
+                        iroTotal = srcTotal[y, x]
+                        iroMax = srcMax[y, x]
+                        iroMaxChroma = srcMaxChroma[y, x]
+                        pStat, iroRes = specular_to_diffuse(
+                            iro, iroMax, iroMaxChroma, iroTotal, refMaxChroma)
 
-                                # update pixelStatus only if
-                                # zSpecular2Diffuse() returned pStat as
-                                # G_NOISE.
-                                if pStat == G_NOISE:
-                                    srcPixelStatus[y, x] = pStat
-                                else:
-                                    src[:, y, x] = iroRes
+                        # update pixelStatus only if
+                        # zSpecular2Diffuse() returned pStat as
+                        # G_NOISE.
+                        if pStat != G_NOISE:
+                            src[:, y, x] = iroRes
+                        # else:
+                        #     srcPixelStatus[y, x] = pStat
 
-                            else:
-                                iro = src[:, y, x + 1]
-                                pStat = srcPixelStatus[y, x + 1]
-                                refMaxChroma = srcMaxChroma[y, x]
-                                iroTotal = srcTotal[y, x + 1]
-                                iroMax = srcMax[y, x + 1]
-                                iroMaxChroma = srcMaxChroma[y, x + 1]
-                                pStat, iroRes = specular_to_diffuse(
-                                    iro, iroMax, iroMaxChroma, iroTotal, refMaxChroma)
+                    else:
+                        iro = src[:, y, x + 1]
+                        # pStat = srcPixelStatus[y, x + 1]
+                        refMaxChroma = srcMaxChroma[y, x]
+                        iroTotal = srcTotal[y, x + 1]
+                        iroMax = srcMax[y, x + 1]
+                        iroMaxChroma = srcMaxChroma[y, x + 1]
+                        pStat, iroRes = specular_to_diffuse(
+                            iro, iroMax, iroMaxChroma, iroTotal, refMaxChroma)
 
-                                # update pixelStatus only if
-                                # zSpecular2Diffuse() returned pStat as
-                                # G_NOISE.
-                                if pStat == G_NOISE:
-                                    srcPixelStatus[y, x + 1] = pStat
-                                else:
-                                    src[:, y, x + 1] = iroRes
+                        # update pixelStatus only if
+                        # zSpecular2Diffuse() returned pStat as
+                        # G_NOISE.
+                        if pStat != G_NOISE:
+                            src[:, y, x + 1] = iroRes
+                        # else:
+                        #     srcPixelStatus[y, x + 1] = pStat
 
-                            srcPixelStatus[y, x] = G_DIFFUSE
-                            srcPixelStatus[y, x + 1] = G_DIFFUSE
+                    srcPixelStatus[y, x] = G_DIFFUSE
+                    srcPixelStatus[y, x + 1] = G_DIFFUSE
 
-                    if(current_pixel == G_SPECULARY):
-                        # if it is a boundary in the y direction
-                        if((abs(dry) > thR) and (abs(dgy) > thG)):
-                            # pixel right
-                            srcPixelStatus[y, x] = G_BOUNDARY
-                            continue
-                        # if it is a noise
-                        elif (abs(srcMaxChroma[y, x] - srcMaxChroma[y + 1, x]) < 0.01):
-                            srcPixelStatus[y, x] = G_NOISE
-                            continue
-                        else:     # reduce the specularity in y direction
-                            if(srcMaxChroma[y, x] < srcMaxChroma[y + 1, x]):
-                                iro = src[:, y, x]
-                                pStat = current_pixel
-                                refMaxChroma = srcMaxChroma[y + 1, x]
-                                iroTotal = srcTotal[y, x]
-                                iroMax = srcMax[y, x]
-                                iroMaxChroma = srcMaxChroma[y, x]
-                                pStat, iroRes = specular_to_diffuse(
-                                    iro, iroMax, iroMaxChroma, iroTotal, refMaxChroma)
-                                # C call:
-                                # zSpecular2Diffuse(src(y,x),src(y+1,x).zMaxChroma())
+                if(current_pixel == G_SPECULARY):
+                    # if it is a boundary in the y direction
+                    if (abs(dry) > thR) and (abs(dgy) > thG):
+                        # pixel right
+                        srcPixelStatus[y, x] = G_BOUNDARY
+                        continue
+                    # if it is a noise
+                    if abs(srcMaxChroma[y, x] - srcMaxChroma[y + 1, x]) < 0.01:
+                        srcPixelStatus[y, x] = G_NOISE
+                        continue
+                    # reduce the specularity in y direction
+                    if srcMaxChroma[y, x] < srcMaxChroma[y + 1, x]:
+                        iro = src[:, y, x]
+                        pStat = current_pixel
+                        refMaxChroma = srcMaxChroma[y + 1, x]
+                        iroTotal = srcTotal[y, x]
+                        iroMax = srcMax[y, x]
+                        iroMaxChroma = srcMaxChroma[y, x]
+                        pStat, iroRes = specular_to_diffuse(
+                            iro, iroMax, iroMaxChroma, iroTotal, refMaxChroma)
+                        # C call:
+                        # zSpecular2Diffuse(src(y,x),src(y+1,x).zMaxChroma())
 
-                                # update pixelStatus only if
-                                # zSpecular2Diffuse() returned pStat as
-                                # G_NOISE.
-                                if pStat == G_NOISE:
-                                    srcPixelStatus[y, x] = pStat
-                                else:
-                                    src[:, y, x] = iroRes
+                        # update pixelStatus only if
+                        # zSpecular2Diffuse() returned pStat as
+                        # G_NOISE.
+                        if pStat == G_NOISE:
+                            srcPixelStatus[y, x] = pStat
+                        else:
+                            src[:, y, x] = iroRes
 
-                            else:
-                                iro = src[:, y + 1, x]
-                                pStat = srcPixelStatus[y + 1, x]
-                                pMaxChroma = srcMaxChroma[y + 1, x]
-                                iroTotal = srcTotal[y + 1, x]
-                                iroMax = srcMax[y + 1, x]
-                                iroMaxChroma = srcMaxChroma[y + 1, x]
-                                pStat, iroRes = specular_to_diffuse(
-                                    iro, iroMax, iroMaxChroma, iroTotal, pMaxChroma)
+                    else:
+                        iro = src[:, y + 1, x]
+                        pStat = srcPixelStatus[y + 1, x]
+                        pMaxChroma = srcMaxChroma[y + 1, x]
+                        iroTotal = srcTotal[y + 1, x]
+                        iroMax = srcMax[y + 1, x]
+                        iroMaxChroma = srcMaxChroma[y + 1, x]
+                        pStat, iroRes = specular_to_diffuse(
+                            iro, iroMax, iroMaxChroma, iroTotal, pMaxChroma)
 
-                                # update pixelStatus only if
-                                # zSpecular2Diffuse() returned pStat as
-                                # G_NOISE.
-                                if pStat == G_NOISE:
-                                    srcPixelStatus[y + 1, x] = pStat
-                                else:
-                                    src[:, y + 1, x] = iroRes
+                        # update pixelStatus only if
+                        # zSpecular2Diffuse() returned pStat as
+                        # G_NOISE.
+                        if pStat == G_NOISE:
+                            srcPixelStatus[y + 1, x] = pStat
+                        else:
+                            src[:, y + 1, x] = iroRes
 
-                            srcPixelStatus[y, x] = G_DIFFUSE
-                            srcPixelStatus[y + 1, x] = G_DIFFUSE
+                    srcPixelStatus[y, x] = G_DIFFUSE
+                    srcPixelStatus[y + 1, x] = G_DIFFUSE
 
         pcount = count
         count, srcPixelStatus = init_labels(src, sfi, epsilon, srcPixelStatus)
@@ -338,7 +463,6 @@ def init_labels(src, sfi, epsilon, srcPixelStatus):
 
     old_settings = np.seterr(divide='ignore', invalid='ignore')
     # to have initial labels
-    count = 0
     zTotalSrc = np.sum(src, axis=0)
     diff_x_src = np.diff(zTotalSrc, axis=1)
     diff_y_src = np.diff(zTotalSrc, axis=0)
@@ -347,35 +471,29 @@ def init_labels(src, sfi, epsilon, srcPixelStatus):
     diff_x_sfi = np.diff(zTotalSfi, axis=1)
     diff_y_sfi = np.diff(zTotalSfi, axis=0)
 
-    dlog_src_x = np.log(abs(diff_x_src))
-    dlog_src_y = np.log(abs(diff_y_src))
+    dlog_src_x = np.log(np.fabs(diff_x_src))
+    dlog_src_y = np.log(np.fabs(diff_y_src))
 
-    dlog_sfi_x = np.log(abs(diff_x_sfi))
-    dlog_sfi_y = np.log(abs(diff_y_sfi))
+    dlog_sfi_x = np.log(np.fabs(diff_x_sfi))
+    dlog_sfi_y = np.log(np.fabs(diff_y_sfi))
 
-    dlogx = abs(dlog_src_x - dlog_sfi_x)
-    dlogy = abs(dlog_src_y - dlog_sfi_y)
+    dlogx = np.fabs(dlog_src_x - dlog_sfi_x)
+    dlogy = np.fabs(dlog_src_y - dlog_sfi_y)
 
-    maxY = src.shape[1]
-    maxX = src.shape[2]
-
-    for y in range(1, maxY - 1):
-        for x in range(1, maxX - 1):
-            pStat = srcPixelStatus[y, x]
-            if pStat not in (G_BOUNDARY, G_NOISE, G_CAMERA_DARK, G_DIFFUSE):
-                # Robby Tan's original C++ code doesn't check for
-                # pStat!=G_DIFFUSE, but this speeds up the processing a lot,
-                # and doesn't seem to affect the results.
-                if dlogx[y, x] > epsilon:
-                    pStat = G_SPECULARX
-                    count += 1
-                elif dlogy[y, x] > epsilon:
-                    pStat = G_SPECULARY
-                    count += 1
-                else:
-                    pStat = G_DIFFUSE
-
-            srcPixelStatus[y, x] = pStat
+    # maxY = src.shape[1]
+    # maxX = src.shape[2]
+    valid_values = (G_BOUNDARY, G_NOISE, G_CAMERA_DARK, G_DIFFUSE)
+    notvalid_mask = np.in1d(
+        srcPixelStatus[1:-1, 1:-1], valid_values,
+        invert=True).reshape(srcPixelStatus.shape[0] - 2, -1)
+    dlogx_mask = (notvalid_mask) & (dlogx[1:-1, 1:] > epsilon)
+    dlogy_mask = (notvalid_mask) & (dlogy[1:, 1:-1] > epsilon) & \
+        (~(dlogx_mask))
+    diffuse_mask = (notvalid_mask) & (~dlogx_mask) & (~dlogy_mask)
+    count = notvalid_mask.sum()
+    srcPixelStatus[1:-1, 1:-1][dlogx_mask] = G_SPECULARX
+    srcPixelStatus[1:-1, 1:-1][dlogy_mask] = G_SPECULARY
+    srcPixelStatus[1:-1, 1:-1][diffuse_mask] = G_DIFFUSE
 
     np.seterr(**old_settings)
     return count, srcPixelStatus    # count is the number of specular pixels
@@ -417,16 +535,46 @@ def specular_to_diffuse(iro, iroMax, iroMaxChroma, iroTotal, refMaxChroma):
     return pixelStatus, iro
 
 
-'''
-reset all pixelStatus labels, except for DARK pixels
-src is numpy-array of shape (3,maxY, maxX)
-pixelLabels is a numpy-array of shape (maxY, maxX)
-Called in zIteration().
-'''
+def specular_to_diffuse_vectorized(iro, iroMax, iroMaxChroma, iroTotal,
+                                   refMaxChroma):
+    """Converts a color-pixel from speckled to diffuse, by subtracting a
+    certain amount from its intensity value in each color channel.
+
+    Args:
+        iro: 3-element column vector containing the rgb-color values of the
+            pixel to be processed.
+        iroMax: max value among the elements of iro
+        iroMaxChroma: max-chroma for this pixel
+        iroTotal: sum of the 3 elements of iro.
+        refMaxChroma: chroma-value of a neighboring pixel for comparison
+
+    Returns:
+        pixelStatus: a value (marker) indicating whether the pixel is
+            considered as noise or diffuse, after processing.
+        iro: updated pixel-color-values.
+    """
+    c = iroMaxChroma
+    # arbitrary initialization
+    pixelStatus = np.empty((*iro.shape[1:]), dtype=iro.dtype)
+    numr = (iroMax * (3.0 * c - 1.0))
+    denm = (c * (3.0 * refMaxChroma - 1.0))
+
+    non_zero = np.fabs(denm) > 0.000000001
+    dI = numr[non_zero] / denm[non_zero]
+    sI = (iroTotal[non_zero] - dI) / 3.0
+    nrgb = iro[:, non_zero] - sI
+    negnrgb = np.logical_or.reduce(nrgb < 0, axis=0)
+
+    pixelStatus[non_zero][negnrgb] = G_NOISE
+    iro[:, non_zero][:, ~negnrgb] = nrgb[:, ~negnrgb]
+    pixelStatus[~non_zero] = G_NOISE
+
+    return pixelStatus, iro
 
 
 def reset_labels(pixelLabels):
     """Resets all pixel-markers (except those indicating "dark" pixels, to 0.
+    Called in zIteration().
 
     Args:
         pixelLabels: numpy array of shape (maxX, maxY) containing pixel-
@@ -533,8 +681,7 @@ def rgb_chroma(rgbImg, rgbTotal=None):
     old_settings = np.seterr(divide='ignore', invalid='ignore')
     rgbChroma = np.divide(rgbImg.astype(float), rgbTotal.astype(float))
     np.seterr(**old_settings)
-    for p in range(rgbChroma.shape[0]):
-        rgbChroma[p, (rgbTotal == 0)] = 0
+    rgbChroma[:, rgbTotal == 0] = 0
 
     return rgbChroma, rgbTotal
 

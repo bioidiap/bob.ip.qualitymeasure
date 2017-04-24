@@ -727,36 +727,26 @@ def edge_thinning(bx, by, thinning=1):
     # np.spacing(1) is the same as eps in matlab.
     myEps = np.spacing(1) * 100.0
     # compute the edge-map a la Matlab
-    for r in range(m):
-        for c in range(n):
-            if thinning:
-                if r < 0 or r > (m - 1) or (c - 1) < 0:
-                    b1 = True
-                else:
-                    b1 = (b[r, c - 1] < b[r, c])
 
-                if(r < 0) or r > (m - 1) or (c + 1) > (n - 1):
-                    b2 = True
-                else:
-                    b2 = (b[r, c] > b[r, c + 1])
+    if not thinning:
+        e = b > cutoff
+    else:
+        b1 = np.ones_like(b, dtype=bool)
+        b2 = np.ones_like(b, dtype=bool)
+        b3 = np.ones_like(b, dtype=bool)
+        b4 = np.ones_like(b, dtype=bool)
 
-                if (c < 0) or c > (n - 1) or (r - 1) < 0:
-                    b3 = True
-                else:
-                    b3 = (b[r, c] > b[r - 1, c])
+        c1 = b > cutoff
 
-                if(c < 1) or c > (n - 1) or (r + 1) > (m - 1):
-                    b4 = True
-                else:
-                    b4 = (b[r, c] > b[r + 1, c])
+        b1[:, 1:] = (np.roll(b, 1, axis=1) < b)[:, 1:]
+        b2[:, :-1] = (np.roll(b, -1, axis=1) < b)[:, :-1]
+        c2 = (bx >= (by - myEps)) & b1 & b2
 
-                c1 = (b[r, c] > cutoff)
-                c2 = ((bx[r, c] >= (by[r, c] - myEps)) & b1 & b2)
-                c3 = ((by[r, c] >= (bx[r, c] - myEps)) & b3 & b4)
+        b3[1:, :] = (np.roll(b, 1, axis=0) < b)[1:, :]
+        b4[:-1, 1:] = (np.roll(b, -1, axis=0) < b)[:-1, 1:]
+        c3 = (by >= (bx - myEps)) & b3 & b4
 
-                e[r, c] = c1 & (c2 | c3)
-            else:
-                e[r, c] = (b[r, c] > cutoff)
+        e = c1 & (c2 | c3)
 
     return e
 
@@ -813,33 +803,17 @@ def angle_similarity(refImage, testImage, diffImage):
 
     refNorm = np.linalg.norm(refImage, axis=1)
     testNorm = np.linalg.norm(testImage, axis=1)
-    thetaVec = np.zeros([refImage.shape[0], 1])
     diffNorm = np.linalg.norm(diffImage, axis=1)
     magnitVec = diffNorm / 255.0  # Galbally divides by sqrt(255**2)
     magnitVec = np.reshape(magnitVec, (refImage.shape[0], 1))
 
-    for i in range(refImage.shape[0]):
-        refR = refImage[i, :]
-        testR = testImage[i, :]
-        cosTheta = np.dot(refR, testR) / (refNorm[i] * testNorm[i])
-        if(cosTheta < -1.0):
-            cosTheta = -1.0
-        if(cosTheta > 1.0):
-            cosTheta = 1.0
-        theta = np.arccos(cosTheta)
-        thetaVec[i] = theta
-
-    # the following (commented out) code should be more efficient than the for-
-    # loop above, but seems to be buggy.
-    # rowDP= np.diag(np.dot(refImage,testImage.T))
-    # normRefrows= np.linalg.norm(refImage,axis=1)
-    # normTestrows= np.linalg.norm(testImage,axis=1)
-
-    # cosThetaVec = rowDP/(normRefrows * normTestrows)
-    # cosThetaVec = np.nan_to_num(cosThetaVec) #nan occurs when one of the
-    # # norms is 0, ie. vector is all 0s. In that case set cosTheta to 0
-
-    # thetaVec = np.arccos(cosThetaVec)
+    # np.einsum('ij,ij->i',a,b) is equivalent to np.diag(np.dot(a,b.T))
+    cosTheta = np.einsum('ij,ij->i', refImage, testImage) / \
+        (refNorm * testNorm)
+    cosTheta[cosTheta < -1.0] = -1.0
+    cosTheta[cosTheta > 1.0] = 1.0
+    cosTheta = np.nan_to_num(cosTheta)
+    thetaVec = np.arccos(cosTheta).reshape((refImage.shape[0], 1))
 
     tmp2 = thetaVec * 2.0 / np.pi
 

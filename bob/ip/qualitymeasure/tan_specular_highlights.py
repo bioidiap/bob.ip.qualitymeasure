@@ -535,41 +535,41 @@ def specular_to_diffuse(iro, iroMax, iroMaxChroma, iroTotal, refMaxChroma):
     return pixelStatus, iro
 
 
-def specular_to_diffuse_vectorized(iro, iroMax, iroMaxChroma, iroTotal,
-                                   refMaxChroma):
-    """Converts a color-pixel from speckled to diffuse, by subtracting a
-    certain amount from its intensity value in each color channel.
-
-    Args:
-        iro: 3-element column vector containing the rgb-color values of the
-            pixel to be processed.
-        iroMax: max value among the elements of iro
-        iroMaxChroma: max-chroma for this pixel
-        iroTotal: sum of the 3 elements of iro.
-        refMaxChroma: chroma-value of a neighboring pixel for comparison
-
-    Returns:
-        pixelStatus: a value (marker) indicating whether the pixel is
-            considered as noise or diffuse, after processing.
-        iro: updated pixel-color-values.
-    """
-    c = iroMaxChroma
-    # arbitrary initialization
-    pixelStatus = np.empty((*iro.shape[1:]), dtype=iro.dtype)
-    numr = (iroMax * (3.0 * c - 1.0))
-    denm = (c * (3.0 * refMaxChroma - 1.0))
-
-    non_zero = np.fabs(denm) > 0.000000001
-    dI = numr[non_zero] / denm[non_zero]
-    sI = (iroTotal[non_zero] - dI) / 3.0
-    nrgb = iro[:, non_zero] - sI
-    negnrgb = np.logical_or.reduce(nrgb < 0, axis=0)
-
-    pixelStatus[non_zero][negnrgb] = G_NOISE
-    iro[:, non_zero][:, ~negnrgb] = nrgb[:, ~negnrgb]
-    pixelStatus[~non_zero] = G_NOISE
-
-    return pixelStatus, iro
+# def specular_to_diffuse_vectorized(iro, iroMax, iroMaxChroma, iroTotal,
+#                                    refMaxChroma):
+#     """Converts a color-pixel from speckled to diffuse, by subtracting a
+#     certain amount from its intensity value in each color channel.
+#
+#     Args:
+#         iro: 3-element column vector containing the rgb-color values of the
+#             pixel to be processed.
+#         iroMax: max value among the elements of iro
+#         iroMaxChroma: max-chroma for this pixel
+#         iroTotal: sum of the 3 elements of iro.
+#         refMaxChroma: chroma-value of a neighboring pixel for comparison
+#
+#     Returns:
+#         pixelStatus: a value (marker) indicating whether the pixel is
+#             considered as noise or diffuse, after processing.
+#         iro: updated pixel-color-values.
+#     """
+#     c = iroMaxChroma
+#     # arbitrary initialization
+#     pixelStatus = np.empty((*iro.shape[1:]), dtype=iro.dtype)
+#     numr = (iroMax * (3.0 * c - 1.0))
+#     denm = (c * (3.0 * refMaxChroma - 1.0))
+#
+#     non_zero = np.fabs(denm) > 0.000000001
+#     dI = numr[non_zero] / denm[non_zero]
+#     sI = (iroTotal[non_zero] - dI) / 3.0
+#     nrgb = iro[:, non_zero] - sI
+#     negnrgb = np.logical_or.reduce(nrgb < 0, axis=0)
+#
+#     pixelStatus[non_zero][negnrgb] = G_NOISE
+#     iro[:, non_zero][:, ~negnrgb] = nrgb[:, ~negnrgb]
+#     pixelStatus[~non_zero] = G_NOISE
+#
+#     return pixelStatus, iro
 
 
 def reset_labels(pixelLabels):

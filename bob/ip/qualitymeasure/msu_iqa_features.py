@@ -399,13 +399,17 @@ def rgbhist(image, maxval, nBins, normType=0):
     im = image.reshape(3, numPix).copy()
     im = im.T
 
-    for i in range(0, numPix):          # for i=1:size(I,1)*size(I,2)
-        p = (im[i, :]).astype(float)     # p = double(im(i,:));
-        # p = floor(p/(maxval/nBins))+1;
-        p = (np.floor(p / decimator)).astype(np.uint32)
-        # H(p(1),p(2),p(3)) = H(p(1),p(2),p(3)) + 1;
-        H[p[0], p[1], p[2]] += 1
-        # end
+    p = np.floor(im.astype(float) / decimator).astype(np.uint32)
+    # in future versions of numpy (1.13 and above) you can replace this with:
+    # unique_p, count = np.unique(p, return_counts=True, axis=0)
+    # the following lines were taken from: https://stackoverflow.com/a/16973510
+    p2 = np.ascontiguousarray(p).view(
+        np.dtype((np.void, p.dtype.itemsize * p.shape[1])))
+    unique_p, count = np.unique(p2, return_counts=True)
+    unique_p = unique_p.view(p.dtype).reshape(-1, p.shape[1])
+    # till here
+    H[unique_p[:, 0], unique_p[:, 1], unique_p[:, 2]] = count
+
     H = H.ravel()  # H = H(:);
     # Un-Normalized histogram
 

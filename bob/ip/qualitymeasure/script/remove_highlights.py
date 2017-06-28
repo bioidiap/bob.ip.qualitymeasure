@@ -13,7 +13,7 @@ import argparse
 import bob.io.base
 import numpy as np
 
-from bob.ip.qualitymeasure import remove_highlights
+from bob.ip.qualitymeasure import remove_highlights_orig
 
 def main(command_line_parameters=None):
     """Remove the specular component of the input image and write result to
@@ -51,7 +51,7 @@ def main(command_line_parameters=None):
     # 2. compute
     print("Extracting diffuse component...")
 
-    sfi, diff, residue = remove_highlights(img.astype(np.float32), 0.5)
+    sfi, diff, residue = remove_highlights_orig(img.astype(np.float32), 0.5)
 
     # 1. save output image
     print("Saving output file: %s" % args.outImg)

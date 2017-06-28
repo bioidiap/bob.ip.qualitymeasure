@@ -19,6 +19,7 @@
  */
 
 #include <blitz/array.h>
+#include <cmath>
 
 #define SPECULARX		10
 #define SPECULARY		11
@@ -415,7 +416,7 @@ int init(   blitz::Array<float ,3> &src,
       dlogy=fabs(dlogy);
 
       // specular in the x direction
-      if(dlogx > epsilon || isinf(dlog_src_x) || isinf(dlog_sfi_x))
+      if(dlogx > epsilon || std::isinf(dlog_src_x) || std::isinf(dlog_sfi_x))
       {
   	     src_i(y,x) = SPECULARX;
 	       count++;
@@ -423,7 +424,7 @@ int init(   blitz::Array<float ,3> &src,
       }
 
       //specular in the y direction
-      if(dlogy > epsilon || isinf(dlog_src_y) || isinf(dlog_sfi_y))
+      if(dlogy > epsilon || std::isinf(dlog_src_y) || std::isinf(dlog_sfi_y))
       {
 	       src_i(y,x)= SPECULARY;
 	       count++;

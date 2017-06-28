@@ -10,14 +10,14 @@
 
 
 // declare C++ function
-void remove_highlights(   blitz::Array<float ,3> &img,
-                          blitz::Array<float ,3> &diff,
-                          blitz::Array<float ,3> &sfi,
-                          blitz::Array<float ,3> &residue,
-                          float  epsilon);
+void remove_highlights_orig(  blitz::Array<float ,3> &img,
+                              blitz::Array<float ,3> &diff,
+                              blitz::Array<float ,3> &sfi,
+                              blitz::Array<float ,3> &residue,
+                              float  epsilon);
 
 // declare the function
-static PyObject* PyRemoveHighlights(PyObject*, PyObject* args, PyObject* kwargs) {
+static PyObject* PyRemoveHighlightsOrig(PyObject*, PyObject* args, PyObject* kwargs) {
 
   BOB_TRY
 
@@ -54,7 +54,7 @@ static PyObject* PyRemoveHighlights(PyObject*, PyObject* args, PyObject* kwargs)
   speckle_img       = 0;
 
   // call the C++ function
-  remove_highlights(img, diffuse_img, speckle_free_img, speckle_img, (float)epsilon);
+  remove_highlights_orig(img, diffuse_img, speckle_free_img, speckle_img, (float)epsilon);
 
   // convert the blitz array back to numpy and return it
   PyObject *ret_tuple = PyTuple_New(3);
@@ -65,7 +65,7 @@ static PyObject* PyRemoveHighlights(PyObject*, PyObject* args, PyObject* kwargs)
   return ret_tuple;
 
   // handle exceptions that occurred in this function
-  BOB_CATCH_FUNCTION("remove_highlights", 0)
+  BOB_CATCH_FUNCTION("remove_highlights_orig", 0)
 }
 
 
@@ -76,8 +76,8 @@ static PyObject* PyRemoveHighlights(PyObject*, PyObject* args, PyObject* kwargs)
 // module-wide methods
 static PyMethodDef module_methods[] = {
   {
-    "remove_highlights",
-    (PyCFunction)PyRemoveHighlights,
+    "remove_highlights_orig",
+    (PyCFunction)PyRemoveHighlightsOrig,
     METH_VARARGS|METH_KEYWORDS,
     "remove_highlights [doc]"
   },

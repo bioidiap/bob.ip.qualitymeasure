@@ -9,7 +9,9 @@ import scipy.signal as ssg
 import bob.ip.base
 import bob.ip.color
 from . import galbally_iqm_features as iqm
-from . import tan_specular_highlights as tsh
+
+#from . import tan_specular_highlights as tsh
+from ._library import remove_highlights
 
 ''' Utility functions '''
 
@@ -155,8 +157,18 @@ def compute_iqa_specularity_features(rgbImage, startEps=0.05):
     """
 
     # separate the specular and diffuse components of input color image.
-    speckleFreeImg, diffuseImg, speckleImg = tsh.remove_highlights(
-        rgbImage.astype(float), startEps, verboseFlag=False)
+    # original python version
+    #speckleFreeImg, diffuseImg, speckleImg = tsh.remove_highlights(
+    #    rgbImage.astype(float), startEps, verboseFlag=False)
+
+    speckleFreeImg, diffuseImg, speckleImg = remove_highlights(
+            rgbImage.astype(np.float32), startEps)
+
+    #speckleImg[np.where(np.isinf(speckleImg))] = 0
+    #speckleImg[np.where(np.isnan(speckleImg))] = 0
+    #speckleImg[np.where(speckleImg < 0)] = 0
+    #speckleImg[np.where(speckleImg > 255)] = 255
+
     # speckleImg contains the specular-component
 
     if len(speckleImg.shape) == 3:

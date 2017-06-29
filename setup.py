@@ -92,6 +92,7 @@ setup(
       # scripts should be declared using this entry:
       'console_scripts': [
         'compute_qualityfeatures.py = bob.ip.qualitymeasure.script.compute_qualitymeasures:main',
+        'remove_highlights.py = bob.ip.qualitymeasure.script.remove_highlights:main',
       ],
     },
 

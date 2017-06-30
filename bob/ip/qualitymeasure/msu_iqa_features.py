@@ -28,7 +28,7 @@ def matlab_rgb2hsv(rgbImage):
     h = hsv[0, :, :]
     s = hsv[1, :, :]
     v = hsv[2, :, :]
-#
+
     return (h, s, v)
 
 
@@ -313,7 +313,6 @@ def marzilianoBlur(image):
         # whist = hist(width_array, t) ./ length(width_array);
 
     return blurMetric
-
 
 def calmoment(channel, regionMask=None):
     """ returns the first 3 statistical moments (mean, standard-dev., skewness)

@@ -164,10 +164,10 @@ def compute_iqa_specularity_features(rgbImage, startEps=0.05):
     speckleFreeImg, diffuseImg, speckleImg = remove_highlights(
             rgbImage.astype(np.float32), startEps)
 
-    #speckleImg[np.where(np.isinf(speckleImg))] = 0
-    #speckleImg[np.where(np.isnan(speckleImg))] = 0
-    #speckleImg[np.where(speckleImg < 0)] = 0
-    #speckleImg[np.where(speckleImg > 255)] = 255
+    speckleImg[np.where(np.isinf(speckleImg))] = 0
+    speckleImg[np.where(np.isnan(speckleImg))] = 0
+    speckleImg[np.where(speckleImg < 0)] = 0
+    speckleImg[np.where(speckleImg > 255)] = 255
 
     # speckleImg contains the specular-component
 

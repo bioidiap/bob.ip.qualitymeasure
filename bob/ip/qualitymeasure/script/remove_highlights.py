@@ -11,6 +11,7 @@ import sys
 import argparse
 
 import bob.io.base
+import bob.io.image
 import numpy as np
 
 from bob.ip.qualitymeasure import remove_highlights_orig

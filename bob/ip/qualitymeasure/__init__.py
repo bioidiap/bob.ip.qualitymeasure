@@ -6,6 +6,7 @@ from .msu_iqa_features import compute_msu_iqa_features
 
 from ._library import remove_highlights
 from ._library_orig import remove_highlights_orig
+from . import tan_specular_highlights as tsh
 
 
 def get_config():

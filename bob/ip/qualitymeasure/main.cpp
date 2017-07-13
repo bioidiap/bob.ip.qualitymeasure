@@ -14,7 +14,9 @@ void remove_highlights(   blitz::Array<float ,3> &img,
                           blitz::Array<float ,3> &diff,
                           blitz::Array<float ,3> &sfi,
                           blitz::Array<float ,3> &residue,
-                          float  epsilon);
+                          float epsilon,
+                          bool  skip_diffuse,
+                          bool  check_nan_inf);
 
 // declare the function
 static PyObject* PyRemoveHighlights(PyObject*, PyObject* args, PyObject* kwargs) {
@@ -54,7 +56,8 @@ static PyObject* PyRemoveHighlights(PyObject*, PyObject* args, PyObject* kwargs)
   speckle_img       = 0;
 
   // call the C++ function
-  remove_highlights(img, diffuse_img, speckle_free_img, speckle_img, (float)epsilon);
+  remove_highlights(img, diffuse_img, speckle_free_img, speckle_img,
+                    (float)epsilon, false, false);
 
   // convert the blitz array back to numpy and return it
   PyObject *ret_tuple = PyTuple_New(3);

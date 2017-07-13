@@ -10,11 +10,9 @@ import bob.ip.base
 import bob.ip.color
 from . import galbally_iqm_features as iqm
 
-#from . import tan_specular_highlights as tsh
 from ._library import remove_highlights
 
 ''' Utility functions '''
-
 
 def matlab_rgb2hsv(rgbImage):
     # first normalize the range of values to 0-1

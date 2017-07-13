@@ -5,8 +5,6 @@ from .galbally_iqm_features import compute_quality_features
 from .msu_iqa_features import compute_msu_iqa_features
 
 from ._library import remove_highlights
-from . import tan_specular_highlights as tsh
-
 
 def get_config():
     """

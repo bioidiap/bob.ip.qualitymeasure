@@ -121,9 +121,6 @@ def test_remove_highlights_integrity():
     sfi1, diff1, residue1 = remove_highlights(img1.astype(np.float32), 0.5)
     sfi2, diff2, residue2 = remove_highlights(img2.astype(np.float32), 0.5)
 
-    #speckleImg[np.where(np.isinf(speckleImg))] = 0
-    #speckleImg[np.where(np.isnan(speckleImg))] = 0
-
     diff1_u8 = diff1.astype('uint8')
     diff2_u8 = diff2.astype('uint8')
 

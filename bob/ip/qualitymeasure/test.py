@@ -110,11 +110,9 @@ def test_msu_feat_extr():
   # test: compare feature-values in bobfset[] with those loaded from hdf5 file
   nose.tools.assert_true((msufset == msu_ref_features).all())
 
-# test if the original version of the specular highlights algorithm
-# (remove_highlights_orig.cpp::remove_highlights_orig) performs exactly
-# like the original code from which it was mostly copied.
-# (this test can probabalty be dropped.)
-def test_remove_highlights_orig_integrity():
+# test if the specular highlights algorithm (remove_highlights.cpp::remove_highlights)
+# performs exactly like the original code from which it was mostly copied.
+def test_remove_highlights_integrity():
     # open pictures
     img1 = image.load(F('old_man.ppm'))
     img2 = image.load(F('toys.ppm'))

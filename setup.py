@@ -93,6 +93,7 @@ setup(
       'console_scripts': [
         'compute_qualityfeatures.py = bob.ip.qualitymeasure.script.compute_qualitymeasures:main',
         'remove_highlights.py = bob.ip.qualitymeasure.script.remove_highlights:main',
+        'highlights_histogram.py = bob.ip.qualitymeasure.script.highlights_histogram:main',
       ],
     },
 

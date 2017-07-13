@@ -1,5 +1,5 @@
 /**
- * @author David Geissbuhler <andre.anjos@idiap.ch>
+ * @author David Geissbuhler <david.geissbuhler@idiap.ch>
  * @date Tue 27 Jun 15:54:00 2016
  *
  *  Original version of the specular highlights removal code by Robby T. Tan
@@ -14,6 +14,10 @@
  *       http://tanrobby.github.io/code.html#
  *       http://tanrobby.github.io/code/highlight.zip
  *
+ *  It also implements a modification used in the previous python version that
+ *  ignores pixels marked G_DIFFUSE, leading to a smaller number of
+ *  iterations per epsilon value, and a flag that ensure no nan and inf values
+ *  are produced.
  */
 
 #include <blitz/array.h>
@@ -22,22 +26,27 @@
 #define SPECULARY		11
 #define DIFFUSE			12
 #define BOUNDARY		13
-#define NOISE			14
-#define CAMERA_DARK		15
+#define NOISE       14
+#define CAMERA_DARK 15
 
 void specular_free_image( blitz::Array<float ,3> &src,
                           blitz::Array<int,2>   &src_i,
-					                blitz::Array<float ,3> &sfi);
+					                blitz::Array<float ,3> &sfi,
+                          bool check_nan_inf);
 
 void iteration(           blitz::Array<float ,3> &src,
                           blitz::Array<int,2>   &src_i,
                           blitz::Array<float ,3> &sfi,
-				                  float  epsilon);
+				                  float  epsilon,
+                          bool skip_diffuse,
+                          bool check_nan_inf);
 
 int init(                 blitz::Array<float ,3> &src,
                           blitz::Array<int,2>   &src_i,
                           blitz::Array<float ,3> &sfi,
-				                  float  epsilon);
+				                  float  epsilon,
+                          bool skip_diffuse,
+                          bool check_nan_inf);
 
 int reset_labels(         blitz::Array<int,2>   &src_i);
 
@@ -46,7 +55,9 @@ void remove_highlights(   blitz::Array<float ,3> &img,
                           blitz::Array<float ,3> &diff,
                           blitz::Array<float ,3> &sfi,
                           blitz::Array<float ,3> &residue,
-                          float  epsilon)
+                          float  epsilon,
+                          bool skip_diffuse,
+                          bool check_nan_inf)
 {
   // flags
   int dim_x = img.shape()[2];
@@ -56,7 +67,7 @@ void remove_highlights(   blitz::Array<float ,3> &img,
 
   //SPECULAR-FREE IMAGE
 
-  specular_free_image(img, img_i, sfi);
+  specular_free_image(img, img_i, sfi, check_nan_inf);
 
   //ITERATIVE PART
   float  step =0.01f;
@@ -68,7 +79,7 @@ void remove_highlights(   blitz::Array<float ,3> &img,
   {
     // run the main iteration
     //printf("*");
-    iteration(diff, img_i, sfi, epsilon);
+    iteration(diff, img_i, sfi, epsilon, check_nan_inf, skip_diffuse);
     epsilon -= step;
     //printf(": %f\n",epsilon);
   }
@@ -124,7 +135,8 @@ inline float  max_chroma(float  r, float  g, float  b)
 
 void specular_free_image( blitz::Array<float ,3> &src,
                           blitz::Array<int,2>   &src_i,
-					                blitz::Array<float ,3> &sfi)
+					                blitz::Array<float ,3> &sfi,
+                          bool check_nan_inf)
 {
   float  Lambda=0.6f;
   float  camDark=10.0f;	// for pixels that are too dark
@@ -160,11 +172,12 @@ void specular_free_image( blitz::Array<float ,3> &src,
       }
 
       //perform the specular-to-diffuse mechanism
-
       float  c    = max_chroma(r,g,b);
       float  numr = max(r,g,b) * (3.0f * c - 1.0f);
       float  denm = c * lambdaConst;
+
       float  dI   = numr / denm;
+      if(denm == 0 && check_nan_inf) dI = 0;
 
       float  sI = (tot(r,g,b) - dI)/3.0f;
 
@@ -193,13 +206,21 @@ void specular_free_image( blitz::Array<float ,3> &src,
 // to apply specular to diffuse equation or mechanism
 
 inline int specular_2_diffuse(int y, int x, blitz::Array<float ,3> &iro,
-                              blitz::Array<int,2> &iro_i, float  maxChroma)
+                              blitz::Array<int,2> &iro_i,
+                              float  maxChroma,
+                              bool check_nan_inf)
 {
   float  c = max_chroma(iro(0,y,x), iro(1,y,x), iro(2,y,x));
   float  m = max(iro(0,y,x), iro(1,y,x), iro(2,y,x));
   float  t = tot(iro(0,y,x), iro(1,y,x), iro(2,y,x));
   float  numr = (m*(3.0f*c - 1.0f));
   float  denm = (c*(3.0f*maxChroma - 1.0f));
+
+  if(check_nan_inf && abs(denm) < 0.000000001)
+  {
+    iro_i(y,x)=NOISE;
+    return 1;
+  }
 
   float  dI = numr / denm;
 
@@ -229,7 +250,9 @@ inline int specular_2_diffuse(int y, int x, blitz::Array<float ,3> &iro,
 void iteration( blitz::Array<float ,3> &src,
                 blitz::Array<int,2>   &src_i,
                 blitz::Array<float ,3> &sfi,
-				        float  epsilon)
+				        float  epsilon,
+                bool skip_diffuse,
+                bool check_nan_inf)
 {
   int x,y;
   int dim_x = src.shape()[2];
@@ -238,7 +261,7 @@ void iteration( blitz::Array<float ,3> &src,
   float  thR = 0.1f, thG = 0.1f;
 
   // to have the initial labels
-  int count = init(src,src_i,sfi,epsilon);
+  int count = init(src,src_i,sfi,epsilon,skip_diffuse,check_nan_inf);
   int pcount;
 
   while(1)
@@ -300,13 +323,13 @@ void iteration( blitz::Array<float ,3> &src,
           //reduce the specularity at x direction
           if(max_chroma(r,g,b) < max_chroma(rx,gx,bx))
           {
-            specular_2_diffuse(y,x,src,src_i,max_chroma(rx,gx,bx));
+            specular_2_diffuse(y,x,src,src_i,max_chroma(rx,gx,bx),check_nan_inf);
             src_i(y,x)=DIFFUSE;
             src_i(y,x+1)=DIFFUSE;
           }
           else
           {
-            specular_2_diffuse(y,x+1,src,src_i,max_chroma(r,g,b));
+            specular_2_diffuse(y,x+1,src,src_i,max_chroma(r,g,b),check_nan_inf);
             src_i(y,x)=DIFFUSE;
             src_i(y,x+1)=DIFFUSE;
           }
@@ -332,13 +355,13 @@ void iteration( blitz::Array<float ,3> &src,
 	        //reduce the specularity in y direction
 	        if(max_chroma(r,g,b) < max_chroma(ry,gy,by))
           {
-            specular_2_diffuse(y,x,src,src_i,max_chroma(ry,gy,by));
+            specular_2_diffuse(y,x,src,src_i,max_chroma(ry,gy,by),check_nan_inf);
             src_i(y,x)=DIFFUSE;
             src_i(y+1,x)=DIFFUSE;
           }
           else
           {
-            specular_2_diffuse(y+1,x,src,src_i,max_chroma(r,g,b));
+            specular_2_diffuse(y+1,x,src,src_i,max_chroma(r,g,b),check_nan_inf);
             src_i(y,x)=DIFFUSE;
             src_i(y+1,x)=DIFFUSE;
           }
@@ -347,7 +370,7 @@ void iteration( blitz::Array<float ,3> &src,
     }
 
     pcount=count;
-    count = init(src,src_i,sfi,epsilon);
+    count = init(src,src_i,sfi,epsilon,skip_diffuse,check_nan_inf);
 
     if(count==0)
 	    break;
@@ -363,7 +386,9 @@ void iteration( blitz::Array<float ,3> &src,
 int init(   blitz::Array<float ,3> &src,
             blitz::Array<int,2>   &src_i,
             blitz::Array<float ,3> &sfi,
-				    float  epsilon)
+				    float   epsilon,
+            bool    skip_diffuse,
+            bool    check_nan_inf)
 {
   int dim_x = src.shape()[2];
   int dim_y = src.shape()[1];
@@ -379,6 +404,8 @@ int init(   blitz::Array<float ,3> &src,
         case NOISE:
         case CAMERA_DARK:
 	        continue;
+        case DIFFUSE:
+          if(skip_diffuse) continue;
 	      break;
       }
 
@@ -403,6 +430,7 @@ int init(   blitz::Array<float ,3> &src,
       dlogy=fabs(dlogy);
 
       // specular in the x direction
+      // if(dlogx > epsilon || std::isinf(dlog_src_x) || std::isinf(dlog_sfi_x))
       if(dlogx > epsilon)
       {
   	     src_i(y,x) = SPECULARX;
@@ -411,6 +439,7 @@ int init(   blitz::Array<float ,3> &src,
       }
 
       //specular in the y direction
+      // if(dlogy > epsilon || std::isinf(dlog_src_y) || std::isinf(dlog_sfi_y))
       if(dlogy > epsilon)
       {
 	       src_i(y,x)= SPECULARY;

@@ -2,31 +2,28 @@
  * @author David Geissbuhler <andre.anjos@idiap.ch>
  * @date Tue 27 Jun 15:54:00 2016
  *
- *  Modified version of the specular highlights removal code by Robby T. Tan
+ *  Original version of the specular highlights removal code by Robby T. Tan
  *  reference:
  *  "separating reflection components of textured surfaces using a single image"
  *  by Robby T. Tan, Katsushi Ikeuchi,
  *  IEEE Transactions on Pattern Analysis and Machine Intelligence (PAMI),
  *  27(2), pp.179-193, February, 2005
+ *
+ *  This is the original implementation based on the C++ code provided by Prof.
+ *  Robby Tan but using Blitz++ arrays:
  *       http://tanrobby.github.io/code.html#
  *       http://tanrobby.github.io/code/highlight.zip
- *
- *  This is a modified implementation based on the C++ code provided by Prof.
- *  Robby Tan but using Blitz++ arrays and with a modification that also
- *  ignores pixels marked G_DIFFUSE. This leads to a smaller number of
- *  iterations per epsilon value, while producing the similar results.
  *
  */
 
 #include <blitz/array.h>
-#include <cmath>
 
 #define SPECULARX		10
 #define SPECULARY		11
 #define DIFFUSE			12
 #define BOUNDARY		13
-#define NOISE			  14
-#define CAMERA_DARK 15
+#define NOISE			14
+#define CAMERA_DARK		15
 
 void specular_free_image( blitz::Array<float ,3> &src,
                           blitz::Array<int,2>   &src_i,
@@ -163,13 +160,11 @@ void specular_free_image( blitz::Array<float ,3> &src,
       }
 
       //perform the specular-to-diffuse mechanism
+
       float  c    = max_chroma(r,g,b);
       float  numr = max(r,g,b) * (3.0f * c - 1.0f);
       float  denm = c * lambdaConst;
-      float  dI;
-
-      if(denm == 0) dI = 0;
-      else dI = numr / denm;
+      float  dI   = numr / denm;
 
       float  sI = (tot(r,g,b) - dI)/3.0f;
 
@@ -189,6 +184,7 @@ void specular_free_image( blitz::Array<float ,3> &src,
       sfi(0,y,x) = dr;
       sfi(1,y,x) = dg;
       sfi(2,y,x) = db;
+
     }
   }
 
@@ -205,34 +201,26 @@ inline int specular_2_diffuse(int y, int x, blitz::Array<float ,3> &iro,
   float  numr = (m*(3.0f*c - 1.0f));
   float  denm = (c*(3.0f*maxChroma - 1.0f));
 
-  if(fabs(denm) > 0.000000001)
-  {
-    float  dI = numr / denm;
+  float  dI = numr / denm;
 
-    float  sI = (t - dI)/3.0f;
+  float  sI = (t - dI)/3.0f;
 
-    float  nr = (iro(0,y,x) - sI);
-    float  ng = (iro(1,y,x) - sI);
-    float  nb = (iro(2,y,x) - sI);
+  float  nr = (iro(0,y,x) - sI);
+  float  ng = (iro(1,y,x) - sI);
+  float  nb = (iro(2,y,x) - sI);
 
-    if(nr<=0 || ng<=0 || nb<=0)
-    {
-      iro_i(y,x)=NOISE;
-      return 1;
-    }
-    else
-    {
-      iro(0,y,x) = nr;
-      iro(1,y,x) = ng;
-      iro(2,y,x) = nb;
-
-      return 0;
-    }
-  }
-  else
+  if(nr<=0 || ng<=0 || nb<=0)
   {
     iro_i(y,x)=NOISE;
     return 1;
+  }
+  else
+  {
+    iro(0,y,x) = nr;
+    iro(1,y,x) = ng;
+    iro(2,y,x) = nb;
+
+    return 0;
   }
 }
 
@@ -390,7 +378,6 @@ int init(   blitz::Array<float ,3> &src,
         case BOUNDARY:
         case NOISE:
         case CAMERA_DARK:
-        case DIFFUSE:
 	        continue;
 	      break;
       }
@@ -416,7 +403,7 @@ int init(   blitz::Array<float ,3> &src,
       dlogy=fabs(dlogy);
 
       // specular in the x direction
-      if(dlogx > epsilon || std::isinf(dlog_src_x) || std::isinf(dlog_sfi_x))
+      if(dlogx > epsilon)
       {
   	     src_i(y,x) = SPECULARX;
 	       count++;
@@ -424,7 +411,7 @@ int init(   blitz::Array<float ,3> &src,
       }
 
       //specular in the y direction
-      if(dlogy > epsilon || std::isinf(dlog_src_y) || std::isinf(dlog_sfi_y))
+      if(dlogy > epsilon)
       {
 	       src_i(y,x)= SPECULARY;
 	       count++;

@@ -23,15 +23,19 @@ static PyObject* PyRemoveHighlights(PyObject*, PyObject* args, PyObject* kwargs)
 
   BOB_TRY
 
-  static const char* const_kwlist[] = {"array", "startEps", 0};
+  static const char* const_kwlist[] =
+    {"array", "startEps", "skip_diffuse", "check_nan_inf", 0};
   static char** kwlist = const_cast<char**>(const_kwlist);
 
   PyBlitzArrayObject* array;
-  double epsilon  = 0.5f;
+  double  epsilon  = 0.5f;
+  bool    skip_diffuse  = false;
+  bool    check_nan_inf = false;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O&|d", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O&|dii", kwlist,
                                   &PyBlitzArray_Converter, &array,
-                                  &epsilon)) return 0;
+                                  &epsilon, &skip_diffuse, &check_nan_inf))
+    return 0;
 
   // check that the array has the expected properties
   if (array->type_num != NPY_FLOAT32|| array->ndim != 3){
@@ -57,7 +61,7 @@ static PyObject* PyRemoveHighlights(PyObject*, PyObject* args, PyObject* kwargs)
 
   // call the C++ function
   remove_highlights(img, diffuse_img, speckle_free_img, speckle_img,
-                    (float)epsilon, false, false);
+                    (float)epsilon, skip_diffuse, check_nan_inf);
 
   // convert the blitz array back to numpy and return it
   PyObject *ret_tuple = PyTuple_New(3);
@@ -88,7 +92,7 @@ static PyMethodDef module_methods[] = {
 };
 
 // module documentation
-PyDoc_STRVAR(module_docstr, "Exemplary Python Bindings");
+PyDoc_STRVAR(module_docstr, "Tan Specular Highlights");
 
 // module definition
 #if PY_VERSION_HEX >= 0x03000000

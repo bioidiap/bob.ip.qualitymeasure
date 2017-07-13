@@ -19,7 +19,7 @@ from . import galbally_iqm_features as iqm
 from . import msu_iqa_features as iqa
 
 from bob.io import image
-from ._library_orig import remove_highlights_orig
+from ._library import remove_highlights
 
 
 REF_VIDEO_FILE = 'real_client001_android_SD_scene01.mp4'
@@ -120,8 +120,8 @@ def test_remove_highlights_orig_integrity():
     img2 = image.load(F('toys.ppm'))
 
     # compute
-    sfi1, diff1, residue1 = remove_highlights_orig(img1.astype(np.float32), 0.5)
-    sfi2, diff2, residue2 = remove_highlights_orig(img2.astype(np.float32), 0.5)
+    sfi1, diff1, residue1 = remove_highlights(img1.astype(np.float32), 0.5)
+    sfi2, diff2, residue2 = remove_highlights(img2.astype(np.float32), 0.5)
 
     #speckleImg[np.where(np.isinf(speckleImg))] = 0
     #speckleImg[np.where(np.isnan(speckleImg))] = 0

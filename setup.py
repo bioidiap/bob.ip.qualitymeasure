@@ -66,20 +66,6 @@ setup(
         version = version,
         bob_packages = bob_packages,
       ),
-
-        # The second extension contains the actual C++ code and the Python bindings
-        Extension("bob.ip.qualitymeasure._library_orig",
-          # list of files compiled into this extension
-          [
-            # the pure C++ code
-            "bob/ip/qualitymeasure/tan_specular_highlights_orig.cpp",
-            # the Python bindings
-            "bob/ip/qualitymeasure/main_orig.cpp",
-          ],
-          # additional parameters, see Extension documentation
-          version = version,
-          bob_packages = bob_packages,
-        ),
     ],
 
     # Important! We need to tell setuptools that we want the extension to be

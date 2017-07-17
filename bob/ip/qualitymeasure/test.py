@@ -129,5 +129,5 @@ def test_remove_highlights_integrity():
     ref2 = image.load(F('toys_diffuse.ppm'))
 
     # test: compare results
-    nose.tools.assert_true((diff1_u8 == ref1).all())
-    nose.tools.assert_true((diff2_u8 == ref2).all())
+    assert (diff1_u8 == ref1).all()
+    assert (diff2_u8 == ref2).all()

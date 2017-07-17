@@ -19,7 +19,7 @@ from . import galbally_iqm_features as iqm
 from . import msu_iqa_features as iqa
 
 from bob.io import image
-from ._library import remove_highlights
+from . import remove_highlights
 
 
 REF_VIDEO_FILE = 'real_client001_android_SD_scene01.mp4'

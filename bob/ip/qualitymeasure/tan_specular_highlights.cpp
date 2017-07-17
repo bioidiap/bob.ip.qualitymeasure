@@ -1,7 +1,4 @@
 /**
- * @author David Geissbuhler <david.geissbuhler@idiap.ch>
- * @date Tue 27 Jun 15:54:00 2016
- *
  *  Original version of the specular highlights removal code by Robby T. Tan
  *  reference:
  *  "separating reflection components of textured surfaces using a single image"

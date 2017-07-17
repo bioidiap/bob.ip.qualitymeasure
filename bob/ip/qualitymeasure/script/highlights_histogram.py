@@ -2,10 +2,6 @@
 # vim: set fileencoding=utf-8 :
 
 '''
-Created on 28 Jun 2017
-
-@author: dgeissbuhler
-
 Compute average specular histogram of an entire picture folder.
 '''
 from __future__ import print_function

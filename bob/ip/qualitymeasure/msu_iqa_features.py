@@ -10,7 +10,7 @@ import bob.ip.base
 import bob.ip.color
 from . import galbally_iqm_features as iqm
 
-from ._library import remove_highlights
+from . import remove_highlights
 
 ''' Utility functions '''
 

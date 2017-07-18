@@ -18,6 +18,30 @@ void remove_highlights(   blitz::Array<float ,3> &img,
                           bool  skip_diffuse,
                           bool  check_nan_inf);
 
+// use the documentation classes to document the function
+static bob::extension::FunctionDoc remove_highlights_doc = bob::extension::FunctionDoc(
+  "remove_highlights",
+  "This function implements a specular highlight removal algorithm.",
+  "This function implements a specular highlight removal algorithm which, by \
+     using an iterative process, separates the specular component from the \
+     diffuse component of the picture. It returns a color incorect specular free \
+     image, the diffuse component and the specular residue, respectively. It is \
+     based on the original code by Robby T. Tan \
+     reference: \
+     separating reflection components of textured surfaces using a single image \
+     by Robby T. Tan, Katsushi Ikeuchi, \
+     IEEE Transactions on Pattern Analysis and Machine Intelligence (PAMI), \
+     27(2), pp.179-193, February, 2005"
+)
+.add_prototype("image", "specular_free_image, diffuse_image, specular_residue, epsilon")
+.add_parameter("image", "array_like (3D, float32)", "The image to process")
+.add_return("specular_free_image", "array_like (3D, float32)", "Specular free image with altered colors.")
+.add_return("diffuse_image", "array_like (3D, float32)", "Diffuse component image, free of specularity.")
+.add_return("specular_residue", "array_like (3D, float32)", "Specular residue of the image.")
+.add_return("epsilon", "float32", "Parameter that specifies the number of iterations.")
+;
+
+
 // declare the function
 static PyObject* PyRemoveHighlights(PyObject*, PyObject* args, PyObject* kwargs) {
 
@@ -86,7 +110,7 @@ static PyMethodDef module_methods[] = {
     "remove_highlights",
     (PyCFunction)PyRemoveHighlights,
     METH_VARARGS|METH_KEYWORDS,
-    "remove_highlights [doc]"
+    remove_highlights_doc.doc()
   },
   {NULL}  // Sentinel
 };

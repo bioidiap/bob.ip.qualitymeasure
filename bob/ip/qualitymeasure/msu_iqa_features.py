@@ -9,10 +9,10 @@ import scipy.signal as ssg
 import bob.ip.base
 import bob.ip.color
 from . import galbally_iqm_features as iqm
-from . import tan_specular_highlights as tsh
+
+from . import remove_highlights
 
 ''' Utility functions '''
-
 
 def matlab_rgb2hsv(rgbImage):
     # first normalize the range of values to 0-1
@@ -26,7 +26,7 @@ def matlab_rgb2hsv(rgbImage):
     h = hsv[0, :, :]
     s = hsv[1, :, :]
     v = hsv[2, :, :]
-#
+
     return (h, s, v)
 
 
@@ -155,8 +155,18 @@ def compute_iqa_specularity_features(rgbImage, startEps=0.05):
     """
 
     # separate the specular and diffuse components of input color image.
-    speckleFreeImg, diffuseImg, speckleImg = tsh.remove_highlights(
-        rgbImage.astype(float), startEps, verboseFlag=False)
+    # original python version
+    #speckleFreeImg, diffuseImg, speckleImg = tsh.remove_highlights(
+    #    rgbImage.astype(float), startEps, verboseFlag=False)
+
+    speckleFreeImg, diffuseImg, speckleImg = remove_highlights(
+            rgbImage.astype(np.float32), startEps)
+
+    speckleImg[np.where(np.isinf(speckleImg))] = 0
+    speckleImg[np.where(np.isnan(speckleImg))] = 0
+    speckleImg[np.where(speckleImg < 0)] = 0
+    speckleImg[np.where(speckleImg > 255)] = 255
+
     # speckleImg contains the specular-component
 
     if len(speckleImg.shape) == 3:
@@ -301,7 +311,6 @@ def marzilianoBlur(image):
         # whist = hist(width_array, t) ./ length(width_array);
 
     return blurMetric
-
 
 def calmoment(channel, regionMask=None):
     """ returns the first 3 statistical moments (mean, standard-dev., skewness)

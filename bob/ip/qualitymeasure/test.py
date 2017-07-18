@@ -18,6 +18,9 @@ import bob.ip.color
 from . import galbally_iqm_features as iqm
 from . import msu_iqa_features as iqa
 
+from bob.io import image
+from . import remove_highlights
+
 
 REF_VIDEO_FILE = 'real_client001_android_SD_scene01.mp4'
 REF_FEATURE_FILE = 'real_client001_android_SD_scene01_ref_feats.h5'
@@ -106,3 +109,25 @@ def test_msu_feat_extr():
 
   # test: compare feature-values in bobfset[] with those loaded from hdf5 file
   nose.tools.assert_true((msufset == msu_ref_features).all())
+
+# test if the specular highlights algorithm (remove_highlights.cpp::remove_highlights)
+# performs exactly like the original code from which it was mostly copied.
+def test_remove_highlights_integrity():
+    # open pictures
+    img1 = image.load(F('old_man.ppm'))
+    img2 = image.load(F('toys.ppm'))
+
+    # compute
+    sfi1, diff1, residue1 = remove_highlights(img1.astype(np.float32), 0.5)
+    sfi2, diff2, residue2 = remove_highlights(img2.astype(np.float32), 0.5)
+
+    diff1_u8 = diff1.astype('uint8')
+    diff2_u8 = diff2.astype('uint8')
+
+    # reference files
+    ref1 = image.load(F('old_man_diffuse.ppm'))
+    ref2 = image.load(F('toys_diffuse.ppm'))
+
+    # test: compare results
+    assert (diff1_u8 == ref1).all()
+    assert (diff2_u8 == ref2).all()

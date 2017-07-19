@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
-# Sushil Bhattacharjee <sushil.bhattacharjee@idiap.ch>
-# Tue 7 Mar 2017 11:26:26 CET
 
 setup_packages = ['bob.extension', 'bob.blitz']
 bob_packages = []
@@ -27,9 +25,9 @@ setup(
     license='GPLv3',
     author='Sushil Bhattacharjee',
     author_email='sushil.bhattacharjee@idiap.ch',
-    keywords='bob, image-quality, face',
     maintainer="David Geissbuhler",
     maintainer_email="david.geissbuhler@idiap.ch",
+    keywords='bob, image-quality, face',
     long_description=open('README.rst').read(),
 
     # This line is required for any distutils based packaging.

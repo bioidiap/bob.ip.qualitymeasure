@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-# encoding: utf-8
-# sushil bhattacharjee <sushil.bhattacharjee@idiap.ch>
-# Fri. 10 March 2017
+# vim: set fileencoding=utf-8 :
+
 
 '''Unit-tests for bob.ip.qualitymeasure'''
 

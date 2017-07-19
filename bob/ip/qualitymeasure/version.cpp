@@ -1,7 +1,4 @@
 /**
- * @author Andre Anjos <andre.anjos@idiap.ch>
- * @date Thu  7 Nov 13:50:16 2013
- *
  * @brief Binds configuration information available from bob
  */
 

@@ -1,8 +1,6 @@
-'''
-Created on 9 Feb 2016
+#!/usr/bin/env python
+# vim: set fileencoding=utf-8 :
 
-@author: sbhatta
-'''
 
 import numpy as np
 import scipy.signal as ssg

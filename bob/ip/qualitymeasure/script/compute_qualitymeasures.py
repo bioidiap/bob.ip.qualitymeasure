@@ -1,11 +1,6 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 
-'''
-Created on 08 Mar 2017
-
-@author: sbhatta
-'''
 
 import sys
 import argparse

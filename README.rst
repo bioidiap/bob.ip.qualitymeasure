@@ -1,10 +1,10 @@
 .. vim: set fileencoding=utf-8 :
 .. Sat  3 Dec 20:18:15 2016 CET
 
-.. image:: http://img.shields.io/badge/docs-stable-yellow.png
-   :target: http://beatubulatest.lab.idiap.ch/private/docs/bob/bob.ip.qualitymeasure/stable/index.html
-.. image:: http://img.shields.io/badge/docs-latest-orange.png
-   :target: http://beatubulatest.lab.idiap.ch/private/docs/bob/bob.ip.qualitymeasure/master/index.html
+.. image:: https://img.shields.io/badge/docs-stable-yellow.png
+   :target: https://www.idiap.ch/software/bob/docs/bob/bob.ip.qualitymeasure/stable/index.html
+.. image:: https://img.shields.io/badge/docs-latest-orange.png
+   :target: https://www.idiap.ch/software/bob/docs/bob/bob.ip.qualitymeasure/master/index.html
 .. image:: https://gitlab.idiap.ch/bob/bob.ip.qualitymeasure/badges/master/build.svg
    :target: https://gitlab.idiap.ch/bob/bob.ip.qualitymeasure/commits/master
 .. image:: https://img.shields.io/badge/gitlab-project-0000c0.svg

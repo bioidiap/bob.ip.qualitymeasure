@@ -1,6 +1,4 @@
 .. vim: set fileencoding=utf-8 :
-.. Sushil Bhattacharjee <sushil.bhattacharjee@idiap.ch>
-.. Tue 08 Mar 2017 15:42:29 CET
 
 .. _bob.ip.qualitymeasure:
 

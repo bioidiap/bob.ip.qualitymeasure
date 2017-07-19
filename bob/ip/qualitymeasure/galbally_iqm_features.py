@@ -1,12 +1,6 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 
-'''
-Created on 25 Sep 2015
-
-@author: sbhatta
-'''
-
 
 import numpy as np
 import scipy.signal as ssg

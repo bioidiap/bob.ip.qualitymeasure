@@ -5,8 +5,8 @@
    :target: https://www.idiap.ch/software/bob/docs/bob/bob.ip.qualitymeasure/stable/index.html
 .. image:: https://img.shields.io/badge/docs-latest-orange.png
    :target: https://www.idiap.ch/software/bob/docs/bob/bob.ip.qualitymeasure/master/index.html
-.. image:: https://gitlab.idiap.ch/bob/bob.ip.qualitymeasure/badges/master/build.svg
-   :target: https://gitlab.idiap.ch/bob/bob.ip.qualitymeasure/commits/master
+.. image:: https://gitlab.idiap.ch/bob/bob.ip.qualitymeasure/badges/v1.0.4/build.svg
+   :target: https://gitlab.idiap.ch/bob/bob.ip.qualitymeasure/commits/v1.0.4
 .. image:: https://img.shields.io/badge/gitlab-project-0000c0.svg
    :target: https://gitlab.idiap.ch/bob/bob.ip.qualitymeasure
 .. image:: http://img.shields.io/pypi/v/bob.ip.qualitymeasure.png

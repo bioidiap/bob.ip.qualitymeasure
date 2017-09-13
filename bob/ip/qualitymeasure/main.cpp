@@ -61,6 +61,8 @@ static PyObject* PyRemoveHighlights(PyObject*, PyObject* args, PyObject* kwargs)
                                   &epsilon, &skip_diffuse, &check_nan_inf))
     return 0;
 
+  auto array_ = make_safe(array);
+
   // check that the array has the expected properties
   if (array->type_num != NPY_FLOAT32|| array->ndim != 3){
     PyErr_Format(PyExc_TypeError,

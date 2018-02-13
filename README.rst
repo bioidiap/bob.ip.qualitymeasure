@@ -1,15 +1,17 @@
 .. vim: set fileencoding=utf-8 :
-.. Sat  3 Dec 20:18:15 2016 CET
+.. Tue Feb 13 16:23:29 CET 2018
 
-.. image:: https://img.shields.io/badge/docs-stable-yellow.png
+.. image:: https://img.shields.io/badge/docs-stable-yellow.svg
    :target: https://www.idiap.ch/software/bob/docs/bob/bob.ip.qualitymeasure/stable/index.html
-.. image:: https://img.shields.io/badge/docs-latest-orange.png
+.. image:: https://img.shields.io/badge/docs-latest-orange.svg
    :target: https://www.idiap.ch/software/bob/docs/bob/bob.ip.qualitymeasure/master/index.html
 .. image:: https://gitlab.idiap.ch/bob/bob.ip.qualitymeasure/badges/master/build.svg
    :target: https://gitlab.idiap.ch/bob/bob.ip.qualitymeasure/commits/master
+.. image:: https://gitlab.idiap.ch/bob/bob.ip.qualitymeasure/badges/master/coverage.svg
+   :target: https://gitlab.idiap.ch/bob/bob.ip.qualitymeasure/commits/master
 .. image:: https://img.shields.io/badge/gitlab-project-0000c0.svg
    :target: https://gitlab.idiap.ch/bob/bob.ip.qualitymeasure
-.. image:: http://img.shields.io/pypi/v/bob.ip.qualitymeasure.png
+.. image:: https://img.shields.io/pypi/v/bob.ip.qualitymeasure.svg
    :target: https://pypi.python.org/pypi/bob.ip.qualitymeasure
 
 
@@ -23,14 +25,14 @@ for PAD experiments by different research groups. Image quality measures
 proposed by Galbally et al. (IEEE TIP 2014) and by Wen et al. (IEEE TIFS 2015)
 are implemented in this package.
 
+
 Installation
 ------------
 
-Follow our `installation`_ instructions. Then, using the Python interpreter
-provided by the distribution, bootstrap and buildout this package::
+Complete Bob's `installation`_ instructions. Then, to install this package,
+run::
 
-  $ python bootstrap-buildout.py
-  $ ./bin/buildout
+  $ conda install bob.ip.qualitymeasure
 
 
 Contact
@@ -42,5 +44,5 @@ development `mailing list`_.
 
 .. Place your references here:
 .. _bob: https://www.idiap.ch/software/bob
-.. _installation: https://gitlab.idiap.ch/bob/bob/wikis/Installation
-.. _mailing list: https://groups.google.com/forum/?fromgroups#!forum/bob-devel
+.. _installation: https://www.idiap.ch/software/bob/install
+.. _mailing list: https://www.idiap.ch/software/bob/discuss

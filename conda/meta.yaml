@@ -35,22 +35,13 @@ requirements:
     - bob.ip.draw
     - bob.ip.color
     - numpy {{ numpy }}
-    - scipy
+    - scipy {{ scipy }}
     - libblitz {{ libblitz }}
   run:
     - python
     - setuptools
-    - bob.extension
-    - bob.blitz
-    - bob.io.base
-    - bob.io.image
-    - bob.io.video
-    - bob.ip.base
-    - bob.ip.draw
-    - bob.ip.color
     - {{ pin_compatible('numpy') }}
     - scipy
-    - libblitz
 
 test:
   imports:

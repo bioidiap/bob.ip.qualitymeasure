@@ -25,15 +25,9 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
-    'matplotlib.sphinxext.plot_directive'
+    'sphinx.ext.mathjax',
+    #'matplotlib.sphinxext.plot_directive'
     ]
-
-import sphinx
-if sphinx.__version__ >= "1.4.1":
-    extensions.append('sphinx.ext.imgmath')
-    imgmath_image_format = 'svg'
-else:
-    extensions.append('sphinx.ext.pngmath')
 
 # Be picky about warnings
 nitpicky = True
@@ -132,7 +126,7 @@ pygments_style = 'sphinx'
 
 # Some variables which are useful for generated material
 project_variable = project.replace('.', '_')
-short_description = u'Extraction of image quality measures for face-PAD experiments.'
+short_description = u'Image-quality feature-extractors for PAD applications'
 owner = [u'Idiap Research Institute']
 
 
@@ -232,7 +226,6 @@ autodoc_member_order = 'bysource'
 autodoc_default_flags = [
   'members',
   'undoc-members',
-  'inherited-members',
   'show-inheritance',
   ]
 
@@ -240,9 +233,12 @@ autodoc_default_flags = [
 from bob.extension.utils import link_documentation, load_requirements
 sphinx_requirements = "extra-intersphinx.txt"
 if os.path.exists(sphinx_requirements):
-    intersphinx_mapping = link_documentation(additional_packages=['python', 'numpy']+load_requirements(sphinx_requirements))
+  intersphinx_mapping = link_documentation(
+      additional_packages=['python','numpy'] + \
+          load_requirements(sphinx_requirements)
+          )
 else:
-    intersphinx_mapping = link_documentation()
+  intersphinx_mapping = link_documentation()
 
 
 # We want to remove all private (i.e. _. or __.__) members

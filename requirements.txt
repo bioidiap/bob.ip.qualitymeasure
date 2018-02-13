@@ -1,5 +1,4 @@
 setuptools
-docopt
 bob.extension
 bob.blitz
 bob.io.base

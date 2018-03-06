@@ -18,9 +18,9 @@ image quality-features computed for the input image
     measure.
 """
 
-
-def compute_quality_features(image):
-    """Extract a set of image quality-features computed for the input image.
+def convert_rgb_image_to_gray(image):
+    """
+    This function converts RGB input image to gray-scale.
 
     Parameters:
 
@@ -29,17 +29,12 @@ def compute_quality_features(image):
         cols). If 2D, image should contain a gray-image of shape [M,N]. If 3D,
         image should have a shape [3,M,N], and should contain an RGB-image.
 
-
     Returns:
 
-    featSet (:py:class:`numpy.ndarray`): a 1D numpy array of 18 float32
-        scalars, each representing one image-quality measure. This function
-        returns a subset of the image-quality features (for face anti-spoofing)
-        that have been described by Galbally et al. in their paper:
-        "Image Quality Assessment for Fake Biometric Detection: Application to
-        Iris, Fingerprint, and Face Recognition", IEEE Trans. on Image
-        Processing Vol 23(2), 2014.
+    gray_image (:py:class:`numpy.ndarray`): A gray-scale image as
+        computed by matlab_rgb2gray function.
     """
+
     gray_image = None
     #print("shape of input image:")
     # print(image.shape)
@@ -57,12 +52,51 @@ def compute_quality_features(image):
         else:
             print('error -- wrong kind of input')
 
+    return gray_image
+
+
+def compute_quality_features(image, smoothed = None):
+    """Extract a set of image quality-features computed for the input image.
+
+    Parameters:
+
+    image (:py:class:`numpy.ndarray`): A ``uint8`` array with 2 or 3
+        dimensions, representing the input image of shape [M,N] (M rows x N
+        cols). If 2D, image should contain a gray-image of shape [M,N]. If 3D,
+        image should have a shape [3,M,N], and should contain an RGB-image.
+
+    smoothed None or :py:class:`numpy.ndarray`
+        A ``uint8`` array with 2 or 3 dimensions, representing the smoothed
+        version of the input image of shape [M,N] (M rows x N
+        cols). If 2D, image should contain a gray-image of shape [M,N]. If 3D,
+        image should have a shape [3,M,N], and should contain an RGB-image.
+        Default: None
+
+    Returns:
+
+    featSet (:py:class:`numpy.ndarray`): a 1D numpy array of 18 float32
+        scalars, each representing one image-quality measure. This function
+        returns a subset of the image-quality features (for face anti-spoofing)
+        that have been described by Galbally et al. in their paper:
+        "Image Quality Assessment for Fake Biometric Detection: Application to
+        Iris, Fingerprint, and Face Recognition", IEEE Trans. on Image
+        Processing Vol 23(2), 2014.
+    """
+
+    gray_image = convert_rgb_image_to_gray(image)
+
     if gray_image is not None:
 
-        gwin = gauss_2d((3, 3), 0.5)  # set up the smoothing-filter
-#         print("computing degraded version of image")
-        smoothed = ssg.convolve2d(
-            gray_image, gwin, boundary='symm', mode='same')
+        if smoothed is None: # default behavior
+
+            gwin = gauss_2d((3, 3), 0.5)  # set up the smoothing-filter
+    #         print("computing degraded version of image")
+            smoothed = ssg.convolve2d(
+                gray_image, gwin, boundary='symm', mode='same')
+
+        else:
+
+            smoothed  = convert_rgb_image_to_gray(smoothed)
 
         """
         Some of the image-quality measures computed here require a reference

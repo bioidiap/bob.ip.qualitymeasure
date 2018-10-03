@@ -23,6 +23,8 @@ requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - pkg-config {{ pkg_config }}
+    - cmake {{ cmake }}
   host:
     - python {{ python }}
     - setuptools {{ setuptools }}

@@ -7,7 +7,6 @@
    import os, sys
    import argparse
 
-   import bob.io.image #remove this if possible
    import bob.io.base
    import bob.io.video
    import bob.ip.color
@@ -33,7 +32,7 @@ Two sets of quality-features are implemented in this package:
 2. The image-quality features proposed by Wen et al. (IEEE TIFS 2015).
 
 The package includes separate modules for implementing the two feature-sets.
-The module ``galbally_iqm_features`` implements the features proposed by Gabally et al., and the module ``msu_iqa_features`` implements the features proposed by Wen et al. 
+The module ``galbally_iqm_features`` implements the features proposed by Gabally et al., and the module ``msu_iqa_features`` implements the features proposed by Wen et al.
 In each module, a single function needs to be called, to retrieve all the features implemented in the module.
 The examples below show how to use the functions in the two modules.
 
@@ -45,9 +44,9 @@ Note also, that in the examples below, the input to the feature-extraction funct
 
 Computing Galbally's image-quality measures
 -------------------------------------------
-The function ``compute_quality_features()`` (in the module galbally_iqm_features) can be used to compute 18 image-quality measures 
+The function ``compute_quality_features()`` (in the module galbally_iqm_features) can be used to compute 18 image-quality measures
 proposed by Galbally et al. Note that Galbally et al. proposed 25 features in their paper. This package implements the following
-18 features from their paper, namely: 
+18 features from their paper, namely:
 [mse, psnr, ad, sc, nk, md, lmse, nae, snrv, ramdv, mas, mams, sme, gme, gpe, ssim, vif, hlfi].
 The function ``galbally_iqm_features::compute_quality_features()`` returns a 1D numpy array of length 18, containing the feature-values in the order listed above.
 
@@ -71,7 +70,7 @@ or a gray-level image.
 When the input image is 3-dimensional, the first dimension being '3' (as is the case in the example above), the input
 is assumed to represent a color RGB image, and is first converted to a gray-level image.
 If the input is 2-dimensional (say, a numpy array of shape [480, 720]), then it is assumed to represent a gray-level
-image, and the RGB-to-gray conversion step is skipped. 
+image, and the RGB-to-gray conversion step is skipped.
 
 
 Computing Wen's (MSU) image-quality measures
@@ -92,5 +91,5 @@ The function ``compute_msu_iqa_features()`` (from the module ``msu_iqa_features`
    121
 
 
-.. _Bob: https://www.idiap.ch/software/bob/ 
+.. _Bob: https://www.idiap.ch/software/bob/
 .. _documentation: https://menpofit.readthedocs.io/en/stable/

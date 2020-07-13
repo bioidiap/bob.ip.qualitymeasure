@@ -30,9 +30,6 @@ requirements:
     - setuptools {{ setuptools }}
     - bob.extension
     - bob.blitz
-    - bob.io.base
-    - bob.io.image
-    - bob.io.video
     - bob.ip.base
     - bob.ip.draw
     - bob.ip.color
@@ -60,6 +57,9 @@ test:
     - coverage
     - sphinx
     - sphinx_rtd_theme
+    - bob.io.base
+    - bob.io.image
+    - bob.io.video
 
 about:
   home: https://www.idiap.ch/software/bob/

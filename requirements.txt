@@ -2,7 +2,6 @@ setuptools
 bob.extension
 bob.blitz
 bob.ip.base
-bob.ip.draw
 bob.ip.color
 numpy
 scipy

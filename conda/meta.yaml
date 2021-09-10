@@ -33,14 +33,14 @@ requirements:
     - bob.blitz
     - bob.ip.base
     - bob.ip.color
+    - libblitz {{ libblitz }}
     - numpy {{ numpy }}
     - scipy {{ scipy }}
-    - libblitz {{ libblitz }}
   run:
     - python
     - setuptools
     - {{ pin_compatible('numpy') }}
-    - scipy
+    - {{ pin_compatible('scipy') }}
 
 test:
   imports:
@@ -52,11 +52,10 @@ test:
     - conda inspect linkages -p $PREFIX {{ name }}  # [not win]
     - conda inspect objects -p $PREFIX {{ name }}  # [osx]
   requires:
-    - bob-devel {{ bob_devel }}.*
-    - nose
-    - coverage
-    - sphinx
-    - sphinx_rtd_theme
+    - nose {{ nose }}
+    - coverage {{ coverage }}
+    - sphinx {{ sphinx }}
+    - sphinx_rtd_theme {{ sphinx_rtd_theme }}
     - bob.io.base
     - bob.io.image
     - bob.io.video

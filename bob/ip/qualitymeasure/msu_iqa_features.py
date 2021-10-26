@@ -65,10 +65,10 @@ def sobelEdgeMap(image, orientation='both'):
     refSobel_sep = bob.ip.base.sobel(refImage)
     refSobelX = refSobel_sep[0, :, :]
     refSobelY = refSobel_sep[1, :, :]
-    if orientation is 'horizontal':
+    if orientation == 'horizontal':
         refEdge = iqm.edge_thinning(refSobelX[:, :], refSobelX[:, :], thinning)
     else:
-        if orientation is 'vertical':
+        if orientation == 'vertical':
             refEdge = iqm.edge_thinning(
                 refSobelY[
                     :, :], refSobelY[

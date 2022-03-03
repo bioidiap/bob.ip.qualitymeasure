@@ -59,7 +59,8 @@ test:
     - sphinx_rtd_theme {{ sphinx_rtd_theme }}
     - bob.io.base
     - bob.io.image
-    - bob.io.video
+    - imageio {{ imageio }}
+    - imageio-ffmpeg {{ imageio_ffmpeg }}
 
 about:
   home: https://www.idiap.ch/software/bob/

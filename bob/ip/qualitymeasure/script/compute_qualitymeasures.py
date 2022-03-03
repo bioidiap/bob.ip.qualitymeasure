@@ -48,14 +48,16 @@ def computeVideoIQM(video4d):
 
 
 def computeIQM_1video(vidPath):
-    """ loads a video, and returns 2 arrays of feature-vectors -- one per
+    """loads a video, and returns 2 arrays of feature-vectors -- one per
     feature-family. Each array contains one feature-vector per frame
     """
-    # 1. load video from input path
-    import bob.io.video
+    import imageio
+    from bob.io.image import to_bob
+    import numpy as np
 
-    inputVideo = bob.io.video.reader(vidPath)
-    vin = inputVideo.load()
+    # 1. load video from input path
+    inputVideo = imageio.get_reader(vidPath)
+    vin = to_bob(np.array(list((inputVideo.iter_data()))))
     # 2. compute and return feature-sets
     return computeVideoIQM(vin)
 

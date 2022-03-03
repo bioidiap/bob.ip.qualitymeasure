@@ -8,7 +8,7 @@
    import argparse
 
    import bob.io.base
-   import bob.io.video
+   import imageio
    import bob.ip.color
    import numpy as np
    from bob.ip.qualitymeasure import galbally_iqm_features as iqm
@@ -18,7 +18,7 @@
 
    import pkg_resources
    video_file = bob.io.base.test_utils.datafile('real_client001_android_SD_scene01.mp4', 'bob.ip.qualitymeasure', 'data')
-   video4d = bob.io.video.reader(video_file)
+   video4d = imageio.get_reader(video_file)
 
 =============
  User Guide
@@ -54,8 +54,9 @@ The function ``galbally_iqm_features::compute_quality_features()`` returns a 1D 
 
 
    >>> from bob.ip.qualitymeasure import galbally_iqm_features as iqm
-   >>> video4d = bob.io.video.reader(video_file) # doctest: +SKIP
-   >>> rgb_frame = video4d[0]
+   >>> video4d = imageio.get_reader(video_file) # doctest: +SKIP
+   >>> from bob.io.image import to_bob
+   >>> rgb_frame = to_bob(video4d.get_data(0))
    >>> print(rgb_frame.shape)
    (3, 480, 720)
    >>> gf_set = iqm.compute_quality_features(rgb_frame)
@@ -84,8 +85,9 @@ The function ``compute_msu_iqa_features()`` (from the module ``msu_iqa_features`
 .. doctest::
 
    >>> from bob.ip.qualitymeasure import msu_iqa_features as iqa
-   >>> video4d = bob.io.video.reader(video_file) # doctest: +SKIP
-   >>> rgb_frame = video4d[0]
+   >>> video4d = imageio.get_reader(video_file) # doctest: +SKIP
+   >>> from bob.io.image import to_bob
+   >>> rgb_frame = to_bob(video4d.get_data(0))
    >>> msuf_set = iqa.compute_msu_iqa_features(rgb_frame)
    >>> print(len(msuf_set))
    121

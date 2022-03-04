@@ -77,8 +77,7 @@ def test_galbally_feat_extr():
         bobfset[f] = iqm.compute_quality_features(rgbFrame)
 
     # test: compare feature-values in bobfset[] with those loaded from hdf5 file
-    nose.tools.assert_true((bobfset == galbally_ref_features).all())
-    # np.allclose(A,B)
+    np.testing.assert_allclose(bobfset, galbally_ref_features, rtol=1e-05, atol=1e-08)
 
 
 def test_msu_feat_extr():
@@ -106,7 +105,7 @@ def test_msu_feat_extr():
         msufset[f] = msuQFeats
 
     # test: compare feature-values in bobfset[] with those loaded from hdf5 file
-    nose.tools.assert_true((msufset == msu_ref_features).all())
+    np.testing.assert_allclose(msufset, msu_ref_features, rtol=1e-05, atol=1e-08)
 
 
 # test if the specular highlights algorithm (remove_highlights.cpp::remove_highlights)
